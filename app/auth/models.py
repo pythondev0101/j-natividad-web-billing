@@ -17,6 +17,12 @@ from app.core.models import Base
 
 
 
+messenger_areas = db.Table('bds_messenger_areas',
+    db.Column('area_id', db.Integer, db.ForeignKey('bds_area.id', ondelete='CASCADE'), primary_key=True),
+    db.Column('messenger_id', db.Integer, db.ForeignKey('auth_user.id', ondelete='CASCADE'), primary_key=True)
+)
+
+
 # AUTH.MODEL.USER
 class User(UserMixin, Base, Admin):
     __tablename__ = 'auth_user'
@@ -38,6 +44,7 @@ class User(UserMixin, Base, Admin):
     role_id = db.Column(db.Integer, db.ForeignKey('auth_role.id'),nullable=True)
     role = db.relationship('Role', cascade='all,delete', backref="userrole")
     is_admin = db.Column(db.Boolean, default=False)
+    areas = db.relationship('Area', secondary=messenger_areas, lazy='subquery',backref=db.backref('messengers', lazy=True), cascade='all,delete')	
 
     def __init__(self):
         Base.__init__(self)

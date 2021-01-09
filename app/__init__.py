@@ -18,6 +18,7 @@ db = SQLAlchemy()
 migrate = Migrate()
 csrf = CSRFProtect()
 login_manager = LoginManager()
+cors = CORS()
 
 MODULES = []
 
@@ -44,7 +45,7 @@ def create_app(config_name):
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
-    CORS(app)
+    cors.init_app(app)
     csrf.init_app(app)
 
     login_manager.login_view = 'bp_auth.login'
@@ -56,20 +57,24 @@ def create_app(config_name):
         from app.core import bp_core
         from app.auth import bp_auth
         from app.admin import bp_admin
+        from bds import bp_bds
         # --------------END--------------
 
         # EDITABLE: REGISTER HERE THE MODULE BLUEPRINTS
         app.register_blueprint(bp_core, url_prefix='/')
         app.register_blueprint(bp_auth, url_prefix='/auth')
         app.register_blueprint(bp_admin, url_prefix='/admin')
+        app.register_blueprint(bp_bds, url_prefix='/bds')
         # --------------END--------------
 
         # EDITABLE: INCLUDE HERE YOUR MODULE Admin models FOR ADMIN TEMPLATE"""
         from app.admin.admin import AdminModule
         from app.auth.auth import AuthModule
+        from bds.bds import BDSModule
 
         MODULES.append(AdminModule)
         MODULES.append(AuthModule)
+        MODULES.append(BDSModule)
         # --------------END--------------
 
         @app.before_first_request
@@ -84,4 +89,3 @@ def create_app(config_name):
             CONTEXT['app_name'] = "Likes" # TODO
 
     return app
-

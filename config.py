@@ -27,6 +27,10 @@ class Config(object):
     """ PAGINATION """
     DATA_PER_PAGE = 7
 
+    # ADD HERE YOUR CONFIG
+    UPLOAD_IMAGES_FOLDER = basedir + "/bds/static/img/uploads"
+    UPLOAD_CSV_FOLDER = basedir + "/bds/static/csv/uploads"
+
 
 class DevelopmentConfig(Config):
     """

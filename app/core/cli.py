@@ -166,7 +166,10 @@ def install():
     else:
         role = Role()
         role.name = "Individual"
+        role1 = Role()
+        role1.name = "Messengers"
         db.session.add(role)
+        db.session.add(role1)
         db.session.commit()
         print("Individual role inserted!")
 
