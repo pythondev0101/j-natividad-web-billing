@@ -38,7 +38,7 @@ def confirm_deliver():
         delivery.status = "PENDING"
         print("PENDING", delivery.id)
 
-    # date = datetime.strptime(date_mobile_delivery, '%m/%d/%Y, %I:%M:%S %p')
+    date = datetime.strptime(date_mobile_delivery, '%m/%d/%Y, %I:%M:%S %p')
 
     img_file = request.files['file']
     
@@ -57,7 +57,7 @@ def confirm_deliver():
     delivery.delivery_longitude = longitude
     delivery.delivery_latitude = latitude
     delivery.accuracy = accuracy
-    delivery.date_mobile_delivery = None
+    delivery.date_mobile_delivery = date
     delivery.date_delivered = datetime.now()
     db.session.commit()
     print("Database updated", delivery.id)
