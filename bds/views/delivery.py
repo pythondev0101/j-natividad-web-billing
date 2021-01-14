@@ -85,8 +85,12 @@ def get_sub_area_subscribers():
 @bp_bds.route('/api/deliveries/<string:contract_number>', methods=['GET'])
 @csrf.exempt
 def get_delivery(contract_number):
+
+    _sub_area_name = request.args['sub_area_name']
+    sub_area = SubArea.query.filter_by(name=_sub_area_name).first()
+
     delivery = Delivery.query.filter_by(active=1).join(Subscriber)\
-        .filter_by(contract_number=contract_number).first()
+        .filter_by(contract_number=contract_number,sub_area_id=sub_area.id).first()
 
     if delivery is None:
         return jsonify({
@@ -111,7 +115,9 @@ def get_delivery(contract_number):
         'latitude': delivery.delivery_latitude,
         'accuracy': accuracy,
         'date_mobile_delivery': delivery.date_mobile_delivery,
-        'image_path': url_for('static', filename=delivery.image_path)
+        'image_path': url_for('bp_bds.static', filename=delivery.image_path),
+        'messenger_fname': delivery.messenger.fname,
+        'messenger_lname': delivery.messenger.lname
     })
 
 
@@ -178,7 +184,7 @@ def deliver():
     return jsonify({'result':True})
 
 
-@bp_bds.route('/api/delivery/reset-all', methods=['POST'])
+@bp_bds.route('/api/deliveries/reset-all', methods=['POST'])
 @csrf.exempt
 def reset_all():
     _sub_area_name = request.json['sub_area_name']
@@ -197,14 +203,16 @@ def reset_all():
     return jsonify({'result':True})
 
 
-@bp_bds.route('/api/delivery/deliver-all', methods=['POST'])
+@bp_bds.route('/api/deliveries/deliver-all', methods=['POST'])
 @csrf.exempt
 def deliver_all():
 
     _sub_area_name = request.json['sub_area_name']
+    print(_sub_area_name)
     sub_area = SubArea.query.filter_by(name=_sub_area_name).first()
 
     if sub_area:
+        print("!!!!")
         for subscriber in sub_area.subscribers:
 
             delivery = Delivery.query.filter_by(subscriber_id=subscriber.id,active=1).first()

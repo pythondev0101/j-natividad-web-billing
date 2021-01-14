@@ -1,10 +1,10 @@
 from datetime import datetime
-from flask import redirect, url_for, request, flash
+from flask import redirect, url_for, request, flash, jsonify
 from flask_login import current_user, login_required
-from app import db
+from app import db, csrf
 from app.admin.routes import admin_table, admin_edit
 from bds import bp_bds
-from bds.models import Subscriber
+from bds.models import Subscriber, Delivery
 from bds.forms import SubscriberForm, SubscriberEditForm
 
 
@@ -56,8 +56,8 @@ def edit_subscriber(oid):
     if request.method == "GET":
         form.deliveries_inline.models = ins.deliveries
 
-        return admin_edit(form,'bp_bds.edit_subscriber',oid, \
-            model=Subscriber,template='bds/bds_edit.html')
+        return admin_edit(form,'bp_bds.edit_subscriber',oid, scripts=[{'bp_bds.static': 'js/subscriber.js'}],
+            model=Subscriber,template='bds/bds_edit.html', extra_modal='bds/bds_details_modal.html')
 
     if not form.validate_on_submit():
         for key, value in form.errors.items():
@@ -81,3 +81,38 @@ def edit_subscriber(oid):
     except Exception as e:
         flash(str(e),'error')
     return redirect(url_for('bp_bds.subscribers'))
+
+
+@bp_bds.route('/api/subscriber/deliveries/<int:delivery_id>', methods=['GET'])
+@csrf.exempt
+def get_subscriber_delivery(delivery_id):
+
+    delivery = Delivery.query.get_or_404(delivery_id)
+    print(delivery)
+    if delivery is None:
+        return jsonify({
+            'id': False
+        })
+
+    accuracy = 0
+    if delivery.accuracy:
+        accuracy = round(float(delivery.accuracy), 2)
+
+    # WE SERIALIZE AND RETURN LIST INSTEAD OF MODELS
+
+    return jsonify({
+        'id': delivery.id,
+        'subscriber_id': delivery.subscriber.id,
+        'subscriber_fname': delivery.subscriber.fname,
+        'subscriber_lname': delivery.subscriber.lname,
+        'subscriber_address': delivery.subscriber.address,
+        'delivery_date': delivery.delivery_date,
+        'status': delivery.status,
+        'longitude': delivery.delivery_longitude,
+        'latitude': delivery.delivery_latitude,
+        'accuracy': accuracy,
+        'date_mobile_delivery': delivery.date_mobile_delivery,
+        'image_path': url_for('bp_bds.static', filename=delivery.image_path),
+        'messenger_fname': delivery.messenger.fname,
+        'messenger_lname': delivery.messenger.lname
+    })

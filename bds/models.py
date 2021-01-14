@@ -21,7 +21,7 @@ class Subscriber(Base, Admin):
     phone_number = db.Column(db.String(64), nullable=True)
     longitude = db.Column(db.String(255),nullable=True)
     latitude = db.Column(db.String(255), nullable=True)
-    deliveries = db.relationship('Delivery', cascade='all,delete', backref="subscriber")
+    deliveries = db.relationship('Delivery', cascade='all,delete', backref="subscriber",order_by="desc(Delivery.delivery_date)")
     sub_area_id = db.Column(db.Integer, db.ForeignKey('bds_sub_area.id', ondelete="SET NULL"), nullable=True)
     sub_area = db.relationship('SubArea',backref="subscribers", uselist=False)
 
@@ -41,6 +41,7 @@ class Delivery(Base, Admin):
     """ COLUMNS """
     subscriber_id = db.Column(db.Integer, db.ForeignKey('bds_subscribers.id', ondelete="SET NULL"), nullable=True)
     messenger_id = db.Column(db.Integer, db.ForeignKey('auth_user.id', ondelete="SET NULL"), nullable=True)
+    messenger = db.relationship('User',backref="deliveries", uselist=False)
     delivery_date = db.Column(db.DateTime, default=datetime.utcnow,nullable=True)
     date_delivered = db.Column(db.DateTime, nullable=True)
     date_mobile_delivery = db.Column(db.DateTime, nullable=True)
