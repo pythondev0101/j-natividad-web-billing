@@ -7,3 +7,4 @@ bp_bds = Blueprint('bp_bds', __name__, template_folder='templates', static_folde
 from . import api
 from . import views
 from . import uploads
+from . import cli
