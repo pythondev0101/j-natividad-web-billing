@@ -289,9 +289,9 @@
 
 
         $("#btn_deliver_all").click(function(){
-            var subAreaName = $("#btnSubAreaLabel").html()
+            var subAreaName = $("#btnSubAreaLabel").html().trim();
             $.ajax({
-                url: "/bds/api/delivery/deliver-all",
+                url: "/bds/api/deliveries/deliver-all",
                 type: "POST",
                 dataType: "json",
                 data: JSON.stringify({'sub_area_name': subAreaName}),
@@ -309,9 +309,10 @@
 
 
         $("#btn_reset_all").click(function(){
-            var subAreaName = $("#btnSubAreaLabel").html()
+            var subAreaName = $("#btnSubAreaLabel").html().trim();
+
             $.ajax({
-                url: "/bds/api/delivery/reset-all",
+                url: "/bds/api/deliveries/reset-all",
                 type: "POST",
                 dataType: "json",
                 data: JSON.stringify({'sub_area_name': subAreaName}),
@@ -386,8 +387,8 @@
 
         $("#tbl_subscribers").on('click','.btn_details',function() {
             var subscriberContractNo = $(this).closest("tr").children('td:first').text();
-            var _area_name = $("#btnSubAreaLabel").html()
-            const url = "/bds/api/deliveries/" + subscriberContractNo;
+            var sub_area_name = $("#btnSubAreaLabel").html().trim();
+            const url = "/bds/api/subscriber/deliveries/" + subscriberContractNo + `?sub_area_name=` + sub_area_name;
 
             $.ajax({
                 url: url,
@@ -407,9 +408,9 @@
 
                         //details
                         $("#li_subscriber").empty();
-                        $("#li_subscriber").append(`<i class="pe-7s-user"> </i>` + "<strong>" + data.subscriber_fname + " " + data.subscriber_lname + "</strong>");
+                        $("#li_subscriber").append(`<i class="pe-7s-user"> </i>` + "<strong> " + data.subscriber_fname + " " + data.subscriber_lname + "</strong>");
                         $("#li_address").empty();
-                        $("#li_address").append(`<i class="pe-7s-map-marker"> </i>` + "<strong>" + data.subscriber_address + "</strong>");
+                        $("#li_address").append(`<i class="pe-7s-map-marker"> </i>` + "<strong> " + data.subscriber_address + "</strong>");
                         $("#li_location").empty();
                         $("#li_location").append(
                             `<i class="pe-7s-map-2"> </i>
@@ -417,8 +418,7 @@
                                 +  " | ACC: " + data.accuracy + "</strong>"
                             );
                         $("#li_mobile_date").empty();
-                        $("#li_mobile_date").append(`<i class="pe-7s-date"> </i>` + "<strong>" + data.date_mobile_delivery + "</strong>");
-
+                        $("#li_mobile_date").append(`<i class="pe-7s-id"> </i>` + "<strong> " + data.messenger_fname + " " + data.messenger_lname + "</strong>" + "    " +  `<i class="pe-7s-date"> </i>` + "<strong> " + data.date_mobile_delivery + "</strong>");
 
                         if(data.status == "PENDING"){
                             //footer

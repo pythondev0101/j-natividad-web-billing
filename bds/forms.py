@@ -27,7 +27,7 @@ class SubscriberForm(AdminIndexForm):
 
 
 class DeliveriesInlineForm(AdminInlineForm):
-    headers = ['Date of delivery','Date Delivered', 'Status']
+    headers = ['Delivery id','Delivery Date','Date Delivered', 'Delivered By', 'Status', 'Actions']
     title = "Billings"
     html = 'bds/deliveries_inline.html'
 
