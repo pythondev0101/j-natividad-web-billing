@@ -388,7 +388,7 @@
         $("#tbl_subscribers").on('click','.btn_details',function() {
             var subscriberContractNo = $(this).closest("tr").children('td:first').text();
             var sub_area_name = $("#btnSubAreaLabel").html().trim();
-            const url = "/bds/api/subscriber/deliveries/" + subscriberContractNo + `?sub_area_name=` + sub_area_name;
+            const url = "/bds/api/deliveries/" + subscriberContractNo + `?sub_area_name=` + sub_area_name;
 
             $.ajax({
                 url: url,
