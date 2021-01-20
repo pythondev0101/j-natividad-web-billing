@@ -1,0 +1,102 @@
+<div class="app-sidebar sidebar-shadow">
+    <div class="app-header__logo">
+        <div class="logo-src"></div>
+        <div class="header__pane ml-auto">
+            <div>
+                <button type="button" class="hamburger close-sidebar-btn hamburger--elastic"
+                        data-class="closed-sidebar">
+                    <span class="hamburger-box">
+                        <span class="hamburger-inner"></span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="app-header__mobile-menu">
+        <div>
+            <button type="button" class="hamburger hamburger--elastic mobile-toggle-nav">
+                <span class="hamburger-box">
+                    <span class="hamburger-inner"></span>
+                </span>
+            </button>
+        </div>
+    </div>
+    <div class="app-header__menu">
+     <span>
+         <button type="button" class="btn-icon btn-icon-only btn btn-primary btn-sm mobile-toggle-header-nav">
+             <span class="btn-icon-wrapper">
+                 <i class="fa fa-ellipsis-v fa-w-6"></i>
+             </span>
+         </button>
+     </span>
+    </div>
+    <div class="scrollbar-sidebar">
+        <div class="app-sidebar__inner">
+            <ul class="vertical-nav-menu">
+                {% block first_sidebar_navigation %}
+                {% if context['module'] == 'admin' %}
+                <li class="app-sidebar__heading">Administration</li>
+                <li>
+                    <a href="{{ url_for('bp_admin.dashboard')}}" class="{% if context['active']=='main_dashboard' %} mm-active {% endif %}">
+                        <i class="metismenu-icon pe-7s-graph1 icon-gradient bg-premium-dark" aria-hidden="true"></i>
+                        Dashboard
+                    </a>
+                    <a href="{{ url_for('bp_admin.apps')}}" class="{% if context['active']=='apps' %} mm-active {% endif %}">
+                        <i class="metismenu-icon pe-7s-plugin icon-gradient bg-premium-dark" aria-hidden="true"></i>
+                        Apps
+                    </a>
+                </li>
+                {% endif %}
+                {% endblock %}
+                {% block second_sidebar_navigation %}
+                <li class="app-sidebar__heading">APP Models</li>
+                    {% for module in context['system_modules'] %}
+                        {% if module['name'] == context['module'] %}
+                            {% for model in module['models'] %}
+                                {% if model['name'] in session['permissions'] %}
+                                    {% if session['permissions'][model['name']]['read'] %}
+                                        {% if model['functions'] %}
+                                            <li>
+                                                <a href="#" class="{% if (context['active'] == model['name'] or parent_model == model['name']) %} mm-active {% endif %}">
+                                                    <i class="metismenu-icon {{ model['icon'] }} icon-gradient bg-premium-dark" aria-hidden="true"></i>
+                                                    {{ model['description'] }}
+                                                    <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
+                                                </a>
+                                                <ul>
+                                                    {% for function in model['functions'] %}
+                                                    {% for name,link in function.items() %}
+                                                    <li>
+                                                        <a href="{{ url_for(link) }}" class="model-function">
+                                                            <i class="metismenu-icon">
+                                                            </i>{{ name }}
+                                                        </a>
+                                                    </li>
+                                                    {% endfor %}
+                                                    {% endfor %}
+                                                </ul>
+                                            </li>
+                                        {% else %}
+                                            <li>
+                                            <a href="{{ url_for(model['list_view_url'])}}" class="{% if context['active']==model['name'] %} mm-active {% endif %}">
+                                                <i class="metismenu-icon {{model['icon']}} icon-gradient bg-premium-dark" aria-hidden="true"></i>
+                                                {{model['description']}}
+                                            </a>
+                                            </li>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    {% endfor %}
+                {% endblock %}
+                
+                {% block configuration_sidebar_navigation %}
+                {% endblock %}
+
+                {% block third_sidebar_navigation %}
+                {% endblock %}
+
+            </ul>
+        </div>
+    </div>
+</div>
