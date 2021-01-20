@@ -44,10 +44,7 @@ class User(UserMixin, Base, Admin):
     role_id = db.Column(db.Integer, db.ForeignKey('auth_role.id'),nullable=True)
     role = db.relationship('Role', cascade='all,delete', backref="userrole")
     is_admin = db.Column(db.Boolean, default=False)
-<<<<<<< HEAD
     areas = db.relationship('Area', secondary=messenger_areas, lazy='subquery',backref=db.backref('messengers', lazy=True), cascade='all,delete')	
-=======
->>>>>>> 5c1f468044cd0268e3f251e4c4a5e7e6807a2f02
 
     def __init__(self):
         Base.__init__(self)
