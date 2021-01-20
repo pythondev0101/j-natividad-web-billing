@@ -285,11 +285,19 @@ def delete_data():
         return resp
     
 
+<<<<<<< HEAD
 @bp_admin.route('/_get_view_modal_data',methods=["POST"])
 @cross_origin()
 def get_view_modal_data():
     try:
         table,column,id = request.json['table'],request.json['column'],request.json['id']
+=======
+@bp_admin.route('/_get_view_modal_data',methods=["GET"])
+@cross_origin()
+def get_view_modal_data():
+    try:
+        table,column,id = request.args.get('table'),request.args.get('column'), request.args.get('id')
+>>>>>>> 5c1f468044cd0268e3f251e4c4a5e7e6807a2f02
         query = "select {} from {} where id = {} limit 1".format(column,table,id)
         sql = text(query)
         row = db.engine.execute(sql)

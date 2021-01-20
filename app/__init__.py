@@ -12,14 +12,20 @@ from flask_wtf.csrf import CSRFProtect
 from flask_cors import CORS
 from config import app_config
 
+# DEVELOPER-NOTE: -INCLUDE YOUR IMPORTS HERE-
 
-# INITIALIZE FLASK IMPORTS
+#                  -END-
+
 db = SQLAlchemy()
 migrate = Migrate()
 csrf = CSRFProtect()
-
-login_manager = LoginManager()
 cors = CORS()
+login_manager = LoginManager()
+
+# DEVELOPER-NOTE: -INITIATE YOUR IMPORTS HERE-
+
+#                   -END-
+
 
 MODULES = []
 
@@ -49,34 +55,40 @@ def create_app(config_name):
     cors.init_app(app)
     csrf.init_app(app)
 
+    # DEVELOPER-NOTE: -INITIALIZE YOUR IMPORTS HERE-
+
+    #                    -END-
+
     login_manager.login_view = 'bp_auth.login'
     login_manager.login_message = "You must be logged in to access this page."
 
     with app.app_context():
 
-        # EDITABLE: IMPORT HERE THE SYSTEM MODULES
+        # DEVELOPER-NOTE: -IMPORT HERE THE SYSTEM MODULES-
         from app.core import bp_core
         from app.auth import bp_auth
         from app.admin import bp_admin
         from bds import bp_bds
-        # --------------END--------------
+        #                   -END-
 
-        # EDITABLE: REGISTER HERE THE MODULE BLUEPRINTS
+        # DEVELOPER-NOTE: -REGISTER HERE THE MODULE BLUEPRINTS-
         app.register_blueprint(bp_core, url_prefix='/')
         app.register_blueprint(bp_auth, url_prefix='/auth')
         app.register_blueprint(bp_admin, url_prefix='/admin')
         app.register_blueprint(bp_bds, url_prefix='/bds')
-        # --------------END--------------
+        #               -END-
 
-        # EDITABLE: INCLUDE HERE YOUR MODULE Admin models FOR ADMIN TEMPLATE"""
+        # DEVELOPER-NOTE: -INCLUDE HERE YOUR MODULE Admin models FOR ADMIN TEMPLATE-
         from app.admin.admin import AdminModule
         from app.auth.auth import AuthModule
         from bds.bds import BDSModule
-
+        #                  -END-
+        
+        # DEVELOPER-NOTE: -APPEND YOUR MODULE HERE-
         MODULES.append(AdminModule)
         MODULES.append(AuthModule)
         MODULES.append(BDSModule)
-        # --------------END--------------
+        #                  -END-
 
         @app.before_first_request
         def setup_context():
@@ -87,6 +99,6 @@ def create_app(config_name):
             CONTEXT['create_modal']: dict
             CONTEXT['header_color'] = 'header_color15' # Default color
             CONTEXT['sidebar_color'] = "sidebar_color15" # Default color
-            CONTEXT['app_name'] = "Likes" # TODO
+            CONTEXT['app_name'] = "JNatividadBilling" # TODO
 
     return app

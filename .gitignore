@@ -68,5 +68,4 @@ instance/
 .env
 bds/static/img/uploads/
 bds/static/csv/uploads/
-.env
 pylintrc

@@ -34,7 +34,7 @@ def api_login():
 @bp_auth.route('/api/users', methods=['GET'])
 def get_users():
     user_list = []
-    users = User.query.all()
+    users = User.query.all
 
     for user in users:
         user_list.append({
@@ -45,7 +45,6 @@ def get_users():
         })
 
     return jsonify({'users':user_list})
-
 
 @bp_auth.route('/api/user/<int:user_id>', methods=['GET'])
 def get_user(user_id):
