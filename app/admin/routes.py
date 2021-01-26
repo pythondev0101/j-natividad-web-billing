@@ -3,9 +3,10 @@ from flask import render_template, flash, redirect, url_for, request, jsonify
 from flask_login import login_required, current_user
 from flask_cors import cross_origin
 from sqlalchemy import text
-from app import CONTEXT, db
+from app import CONTEXT, SYSTEM_MODULES, db
+from app import admin
 from app.core.models import CoreModel, CoreModule
-from app.admin import bp_admin
+from app.admin import bp_admin, admin_render_template
 from app.auth.permissions import check_read
 
 
@@ -135,7 +136,7 @@ def admin_table(*models, fields, form=None, list_view_url='', create_url=None, c
     
     CONTEXT['current_list_view_url'] = list_view_url
 
-    return render_template(template, context=CONTEXT, form=form, create_fields=fields, create_button=create_button,
+    return admin_render_template(template, check_module.name, form=form, create_fields=fields, create_button=create_button,
                         model_data=model_data, table_fields=table_fields,parent_model= parent_model,
                         heading=index_title, sub_heading=index_message,
                         title=title, action=action, create_modal=create_modal, extra_modal=extra_modal,
@@ -192,7 +193,7 @@ def admin_edit(form, update_url, oid, modal_form=False, action="admin/admin_edit
 
     if query1:
         check_module = CoreModule.query.get(query1.module_id)
-        CONTEXT['module'] = check_module.name
+        # CONTEXT['module'] = check_module.name
 
     if kwargs is not None:
         if 'template' in kwargs:
@@ -204,40 +205,51 @@ def admin_edit(form, update_url, oid, modal_form=False, action="admin/admin_edit
         if 'update_url' in kwargs:
             update_url = kwargs.get('update_url')
     
-    return render_template(template, context=CONTEXT, form=form, update_url=update_url, edit_fields=fields,
+    return admin_render_template(template, check_module.name, form=form, update_url=update_url, edit_fields=fields,
                            oid=oid,modal_form=modal_form,edit_title=form.edit_title,delete_table=delete_table, scripts=scripts,
                            action=action,extra_modal=extra_modal, title=form.edit_title,rendered_model=model,parent_model=parent_model)
 
 
-def admin_dashboard(box1=None,box2=None,box3=None,box4=None):
+def admin_dashboard(template, **kwargs):
     from app.auth.models import User
-    if not box1:
-        box1 = DashboardBox("Total Modules","Installed",CoreModule.query.count())
 
-    if not box2:
-        box2 = DashboardBox("System Models","Total models",CoreModel.query.count())
+    options = {
+        'box1': None,
+        'box2': None,
+        'box3': None,
+        'box4': None,
+        'data': None,
+        'title': 'Admin Dashboard'
+    }
 
-    if not box3:
-        box3 = DashboardBox("Users","Total users",User.query.count())
+    options.update(kwargs)
+
+    if options['box1'] is None:
+        options['box1'] = DashboardBox("Total Modules","Installed",CoreModule.query.count())
+
+    if options['box2'] is None:
+        options['box2'] = DashboardBox("System Models","Total models",CoreModel.query.count())
+
+    if options['box3'] is None:
+        options['box3'] = DashboardBox("Users","Total users",User.query.count())
     
     CONTEXT['active'] = 'main_dashboard'
-    CONTEXT['module'] = 'admin'
 
-    return render_template("admin/admin_dashboard.html", context=CONTEXT,title='Admin Dashboard', \
-        box1=box1,box2=box2,box3=box3)
+    return admin_render_template(template, 'admin', context=CONTEXT,title=options['title'], \
+        options=options,data=options['data'])
 
 
 @bp_admin.route('/') # move to views
 @login_required
 def dashboard():
-    return admin_dashboard()
+    return admin_dashboard("admin/admin_dashboard.html")
 
 
 @bp_admin.route('/apps')
 def apps():
     CONTEXT['active'] = 'apps'
     modules = CoreModule.query.all()
-    return render_template('admin/admin_apps.html',context=CONTEXT,title='Apps',modules=modules)
+    return admin_render_template('admin/admin_apps.html', 'admin',context=CONTEXT,title='Apps',modules=modules)
 
 
 @bp_admin.route('/delete/<string:delete_table>/<int:oid>',methods=['POST'])
@@ -285,19 +297,11 @@ def delete_data():
         return resp
     
 
-<<<<<<< HEAD
-@bp_admin.route('/_get_view_modal_data',methods=["POST"])
-@cross_origin()
-def get_view_modal_data():
-    try:
-        table,column,id = request.json['table'],request.json['column'],request.json['id']
-=======
 @bp_admin.route('/_get_view_modal_data',methods=["GET"])
 @cross_origin()
 def get_view_modal_data():
     try:
         table,column,id = request.args.get('table'),request.args.get('column'), request.args.get('id')
->>>>>>> 5c1f468044cd0268e3f251e4c4a5e7e6807a2f02
         query = "select {} from {} where id = {} limit 1".format(column,table,id)
         sql = text(query)
         row = db.engine.execute(sql)
