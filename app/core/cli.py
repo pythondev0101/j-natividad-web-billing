@@ -155,7 +155,9 @@ def create_module(module_name):
             core_init_path = basedir + "/app" + "/core" + "/module_template" + "/__init__.py"
             core_models_path = basedir + "/app" + "/core" + "/module_template" + "/models.py"
             core_routes_path = basedir + "/app" + "/core" + "/module_template" + "/routes.py"
-
+        else:
+            raise Exception
+        
         core_file_list = [core_init_path, core_models_path, core_routes_path]
 
         if not os.path.exists(module_path):
