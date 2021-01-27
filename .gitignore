@@ -69,3 +69,4 @@ instance/
 bds/static/img/uploads/
 bds/static/csv/uploads/
 pylintrc
+app/admin/static/img/
