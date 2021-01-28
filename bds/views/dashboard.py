@@ -1,6 +1,6 @@
-from flask import render_template
 from flask_login import login_required
 from app import CONTEXT
+from app.admin.routes import admin_dashboard
 from bds import bp_bds
 
 
@@ -9,6 +9,6 @@ from bds import bp_bds
 @bp_bds.route('/dashboard')
 @login_required
 def dashboard():
-    CONTEXT['module'] = 'bds'
-    CONTEXT['active'] = 'main_dashboard'
-    return render_template('bds/bds_dashboard.html',context=CONTEXT, title="Dashboard",)
+    CONTEXT['active'] = 'delivery_map'
+
+    return admin_dashboard('bds/bds_dashboard.html', title="Dashboard", module='bds')

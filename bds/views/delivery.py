@@ -1,14 +1,15 @@
-from flask import (
-    render_template, flash,
-    redirect, url_for, request,
-    jsonify, session, abort)
+from flask import (url_for, request,jsonify, session, abort)
 from flask_login import login_required
 from sqlalchemy import or_
 from app import db, CONTEXT, csrf
+from app.admin import admin_render_template
 from bds import bp_bds
 from bds.models import Delivery, SubArea, Municipality, Subscriber, Area
 
 
+modals = [
+    'bds/bds_details_modal.html',
+]
 
 @bp_bds.route('/deliveries',methods=['GET'])
 @login_required
@@ -16,13 +17,12 @@ def deliveries():
 
     _sub_areas = SubArea.query.all()
     _municipalities = Municipality.query.all()
-
-    CONTEXT['active'] = 'delivery'
+    
     CONTEXT['model'] = 'delivery'
-    CONTEXT['module'] = 'bds'
+    CONTEXT['active'] = 'delivery'
 
-    return render_template('bds/bds_delivery.html',context=CONTEXT,title="Delivery",\
-        subAreas=_sub_areas, municipalities=_municipalities)
+    return admin_render_template('bds/bds_delivery.html', 'bds', title="Delivery",\
+        subAreas=_sub_areas, municipalities=_municipalities, modals=modals)
 
 
 @bp_bds.route('/api/get-sub-area-subscribers')

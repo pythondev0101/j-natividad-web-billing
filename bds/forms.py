@@ -29,7 +29,7 @@ class SubscriberForm(AdminIndexForm):
 class DeliveriesInlineForm(AdminInlineForm):
     headers = ['Delivery id','Delivery Date','Date Delivered', 'Delivered By', 'Status', 'Actions']
     title = "Billings"
-    html = 'bds/deliveries_inline.html'
+    html = 'bds/subscriber/deliveries_inline.html'
 
 
 class SubscriberEditForm(AdminEditForm):
@@ -87,19 +87,19 @@ class MessengerEditForm(AdminEditForm):
 
 
 class AreaForm(AdminIndexForm):
-    from app.core.models import CoreCity
+    from bds.models import Municipality
 
     index_headers = ['Name', 'description', 'Created at', 'updated at']
     index_title = "Areas"
 
     name = AdminField(label="Name",validators=[DataRequired()])
     description = AdminField(label="Description", required=False)
-    city = AdminField(label="Municipality", required=False, model=CoreCity)
+    municipality_id = AdminField(label="Municipality", required=False, model=Municipality)
 
     def create_fields(self):
         return [
             [self.name, self.description],
-            [self.city]
+            [self.municipality_id]
         ]
 
 
@@ -121,14 +121,17 @@ class SubAreaForm(AdminIndexForm):
 
 
 class AreaEditForm(AdminEditForm):
+    from bds.models import Municipality
+
     edit_title = 'Edit Area'
 
     name = AdminField(label="Name",validators=[DataRequired()])
     description = AdminField(label="Description", required=False)
+    municipality_id = AdminField(label="Municipality", required=False, model=Municipality)
 
     def edit_fields(self):
         return [
-            [self.name, self.description],
+            [self.name, self.description], [self.municipality_id]
         ]
 
 

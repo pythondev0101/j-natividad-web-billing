@@ -14,9 +14,9 @@ from bds.forms import SubscriberForm, SubscriberEditForm
 def subscribers():
     fields = [Subscriber.id, Subscriber.fname,Subscriber.lname,Subscriber.created_at, Subscriber.updated_at]
     form = SubscriberForm()
-    return admin_table(Subscriber, fields=fields, form=form, template='bds/bds_table.html',create_url="bp_bds.create_subscriber",\
-        edit_url="bp_bds.edit_subscriber", extra_modal="bds/bds_upload_subscribers_csv.html",\
-            action="bds/bds_subscriber_action.html")
+    return admin_table(Subscriber, fields=fields, form=form, create_url="bp_bds.create_subscriber",\
+        edit_url="bp_bds.edit_subscriber", extra_modal="bds/subscriber/bds_upload_subscribers_csv.html",\
+            action="bds/subscriber/bds_subscriber_action.html")
 
 
 @bp_bds.route('/subscribers/create',methods=['POST'])
@@ -57,7 +57,7 @@ def edit_subscriber(oid):
         form.deliveries_inline.models = ins.deliveries
 
         return admin_edit(form,'bp_bds.edit_subscriber',oid, scripts=[{'bp_bds.static': 'js/subscriber.js'}],
-            model=Subscriber,template='bds/bds_edit.html', extra_modal='bds/bds_details_modal.html')
+            model=Subscriber, extra_modal='bds/bds_details_modal.html')
 
     if not form.validate_on_submit():
         for key, value in form.errors.items():

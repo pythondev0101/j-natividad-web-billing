@@ -1,5 +1,4 @@
-{% extends 'bds/bds_scripts.html' %}
-
+{% extends 'admin/admin_base.html' %}
 
 {% block content %}
 <div class="app-main__inner">
@@ -98,10 +97,8 @@
 
 
 {% block scripts %}
-
 <script>
 
-    
     $(document).ready(function(){
         
         var DELIVERYID;
@@ -503,6 +500,11 @@
 {% endblock %}
 
 
+{% block inner_footer %}
+<!-- pass -->
+{% endblock %}
+
+
 {% block toast %}
 <div id="toast-container" class="toast-top-center">
     
@@ -520,11 +522,4 @@
             <div class="toast-message">Error occured</div>
     </div>
 </div>
-{% endblock %}
-
-
-{% block modals %}
-    
-    {% include 'bds/bds_details_modal.html' %}
-
 {% endblock %}

@@ -17,10 +17,11 @@ def messengers():
     fields = [User.id, User.username, User.fname, User.lname, User.email, User.created_at, User.updated_at]
     models = [User]
     query = User.query.with_entities(*fields).filter_by(role_id=2).all()
+
     return admin_table(*models, fields=fields, list_view_url="bp_bds.messengers",\
-        create_url='bp_bds.create_messenger',\
-        edit_url="bp_bds.edit_messenger", form=form,\
-        kwargs={'module': 'bds','model_data':query}, template="bds/bds_table.html")
+        create_url='bp_bds.create_messenger', edit_url="bp_bds.edit_messenger", form=form,\
+        kwargs={'module': 'bds','model_data':query}
+        )
 
 
 @bp_bds.route('/messengers/create', methods=['POST'])

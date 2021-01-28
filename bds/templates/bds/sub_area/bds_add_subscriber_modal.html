@@ -22,7 +22,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {% for subscriber in subscribers %}
+                                {% for subscriber in data['subscribers'] %}
                                 <tr class="item" id="{{ subscriber.id }}">
                                     <td style="display:none;">{{ subscriber.id }}</td>
                                     <td><input class="chkbox" type="checkbox"></td>

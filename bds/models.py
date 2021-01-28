@@ -35,7 +35,6 @@ class Delivery(Base, Admin):
     __amname__ = 'delivery'
     __amdescription__ = 'Deliveries'
     __amicon__ = 'pe-7s-paper-plane'
-    __amfunctions__ = []
     __list_view_url__ = 'bp_bds.deliveries'
     
     """ COLUMNS """
@@ -67,7 +66,6 @@ class Area(Base, Admin):
         {"Areas": "bp_bds.areas"},
         {"Municipalities": "bp_bds.municipalities"},
         ]
-    # __list_view_url__ = 'bp_bds.areas'
 
     """ COLUMNS """
     name = db.Column(db.String(255),nullable=False)
@@ -81,7 +79,6 @@ class SubArea(Base, Admin):
     __amname__ = 'sub_area'
     __amdescription__ = 'Sub Areas'
     __amicon__ = 'pe-7s-flag'
-    __amfunctions__ = []
     __parent_model__ = 'area'
     #__list_view_url__ = 'bp_bds.areas'
 
@@ -98,7 +95,6 @@ class Messenger(db.Model, Admin):
     __amname__ = 'user'
     __amdescription__ = 'Messengers'
     __amicon__ = 'pe-7s-car'
-    __amfunctions__ = []
     __list_view_url__ = 'bp_bds.messengers'
 
 
@@ -107,8 +103,14 @@ class Municipality(Base, Admin):
     __amname__ = 'municipality'
     __amdescription__ = 'Municipalities'
     __amicon__ = 'pe-7s-flag'
-    __amfunctions__ = []
     __parent_model__ = 'area'
 
     name = db.Column(db.String(255),nullable=False)
     description = db.Column(db.String(1000),nullable=True)
+
+
+class DeliveryMap(Admin):
+    __amname__ = 'delivery_map'
+    __amdescription__ = 'Delivery Map'
+    __amicon__ = 'pe-7s-map-2'
+    __list_view_url__ = 'bp_bds.dashboard'

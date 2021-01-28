@@ -22,7 +22,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {% for messenger in messengers %}
+                                {% for messenger in data['messengers'] %}
                                 <tr class="item" id="{{ messenger.id }}">
                                     <td style="display:none;">{{ messenger.id }}</td>
                                     <td><input class="chkbox" type="checkbox"></td>

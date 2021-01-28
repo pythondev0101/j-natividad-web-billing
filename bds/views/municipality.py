@@ -8,12 +8,14 @@ from bds.models import Municipality
 from bds.forms import MunicipalityForm, MunicipalityEditForm
 
 
+
 @bp_bds.route('/municipalities')
 @login_required
 def municipalities():
     fields = [Municipality.id, Municipality.name, Municipality.description, Municipality.created_at, Municipality.updated_at]
     form = MunicipalityForm()
-    return admin_table(Municipality, fields=fields,form=form, template="bds/bds_table.html",\
+
+    return admin_table(Municipality, fields=fields,form=form,\
         create_url='bp_bds.create_municipality', edit_url='bp_bds.edit_municipality')
 
 
@@ -49,8 +51,7 @@ def edit_municipality(oid):
     form = MunicipalityEditForm(obj=ins)
 
     if request.method == "GET":
-        return admin_edit(form,'bp_bds.edit_municipality',oid, \
-            model=Municipality,template='bds/bds_edit.html')
+        return admin_edit(form,'bp_bds.edit_municipality',oid, model=Municipality)
 
     if not form.validate_on_submit():
         for key, value in form.errors.items():

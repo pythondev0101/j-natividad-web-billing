@@ -1,4 +1,4 @@
-{% extends "bds/bds_scripts.html" %}
+{% extends "admin/admin_base.html" %}
 
 {% block content %}
 <div class="app-main__inner">
@@ -61,7 +61,7 @@
                                     <label for="municipality_id" class="">Municipality</label>
                                     <select name="municipality_id" id="municipality_id" class="form-control">
                                         <option value="">Choose...</option>
-                                        {% for municipality in municipalities %}
+                                        {% for municipality in data['municipalities'] %}
                                         <option value="{{ municipality.id }}">
                                             {{municipality.name}}
                                         </option>
@@ -135,4 +135,21 @@
     </form>
 </div>
 
+{% endblock %}
+
+
+{% block inner_footer %}
+<div class="app-footer-left">
+    <button form="create_form" type="submit" class="btn btn-primary" style="margin-right: 10px;">Save</button>
+    <button type="button" class="btn btn-secondary" onclick="history.back(-1)">Cancel</button>
+</div>
+{% endblock %}
+
+
+{% block extra_head %}
+<style>
+    .myHiddenColumn {
+        display: none;
+    }
+</style>
 {% endblock %}

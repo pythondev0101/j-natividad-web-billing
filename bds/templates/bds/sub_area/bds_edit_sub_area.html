@@ -1,4 +1,4 @@
-{% extends "bds/bds_scripts.html" %}
+{% extends "admin/admin_base.html" %}
 
 {% block content %}
 <div class="app-main__inner">
@@ -33,7 +33,7 @@
                                 <div class="position-relative form-group">
                                     <label for="name" class="">Name</label>
                                     <input name="name" id="name" type="text" class="form-control input_required"
-                                        required value="{{ins.name}}">
+                                        required value="{{data['ins'].name}}">
                                     <div class="valid-feedback">
                                         Looks good!
                                     </div>
@@ -46,7 +46,7 @@
                                 <div class="position-relative form-group">
                                     <label for="description" class="">Description</label>
                                     <input name="description" id="description" type="text" class="form-control"
-                                        value="{{ins.description}}">
+                                        value="{{data['ins'].description}}">
                                     <div class="valid-feedback">
                                         Looks good!
                                     </div>
@@ -60,8 +60,8 @@
                                     <label for="area_id" class="">Area</label>
                                     <select name="area_id" id="area_id" class="form-control input_required" required>
                                         <option value="">Choose...</option>
-                                        {% for area in areas %}
-                                        <option value="{{ area.id }}" {% if ins.area_id == area.id %}selected{% endif %}>
+                                        {% for area in data['areas'] %}
+                                        <option value="{{ area.id }}" {% if data['ins'].area_id == area.id %}selected{% endif %}>
                                             {{ area.name }}
                                         </option>
                                         {% endfor %}
@@ -93,7 +93,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {% for subscriber in ins.subscribers %}
+                                        {% for subscriber in data['ins'].subscribers %}
                                         <tr>
                                             <td style="display:none;"><input name="subscribers[]" type="hidden"
                                                     value="{{subscriber.id}}"></td>
@@ -142,4 +142,22 @@
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
     </form>
 </div>
+{% endblock %}
+
+
+
+{% block inner_footer %}
+<div class="app-footer-left">
+    <button form="create_form" type="submit" class="btn btn-primary" style="margin-right: 10px;">Save</button>
+    <button type="button" class="btn btn-secondary" onclick="history.back(-1)">Cancel</button>
+</div>
+{% endblock %}
+
+
+{% block extra_head %}
+<style>
+    .myHiddenColumn {
+        display: none;
+    }
+</style>
 {% endblock %}

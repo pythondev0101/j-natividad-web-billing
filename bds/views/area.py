@@ -1,6 +1,7 @@
 from flask import redirect, url_for, request, flash, render_template
 from flask_login import login_required
 from app import db, CONTEXT
+from app.admin.templating import admin_render_template
 from app.admin.routes import admin_table
 from app.auth.models import User
 from bds import bp_bds
@@ -9,15 +10,22 @@ from bds.forms import AreaForm
 
 
 
+scripts = [
+    {'bp_bds.static': 'js/area.js'}
+]
+
+modals = [
+    "bds/area/bds_add_messenger_modal.html"
+]
+
 @bp_bds.route('/areas')
 @login_required
 def areas():
     fields = [Area.id,Area.name, Area.description, Area.created_at, Area.updated_at]
     form = AreaForm()
-    CONTEXT['create_modal']['create_url'] = False
 
-    return admin_table(Area, fields=fields,form=form,template='bds/bds_table.html',\
-        create_url='bp_bds.create_area', create_button=True, edit_url="bp_bds.edit_area", create_modal=False)
+    return admin_table(Area, fields=fields,form=form, create_url='bp_bds.create_area',\
+        create_button=True, edit_url="bp_bds.edit_area", create_modal=False)
 
 
 @bp_bds.route('/areas/create', methods=["GET","POST"])
@@ -27,10 +35,15 @@ def create_area():
     if request.method == "GET":
         _messengers = User.query.filter_by(role_id=2).all()
         _municipalities = Municipality.query.all()
-        CONTEXT['module'] = 'bds'
+
+        data = {
+            'messengers': _messengers,
+            'municipalities': _municipalities
+        }
+
         CONTEXT['model'] = 'area'
-        return render_template("bds/bds_create_area.html",context=CONTEXT, messengers=_messengers,\
-            title="Create area", municipalities=_municipalities)
+        return admin_render_template("bds/area/bds_create_area.html", 'bds', title="Create area",\
+            data=data, modals=modals, scripts=scripts)
 
     try:
         new = Area()
@@ -67,11 +80,16 @@ def edit_area(oid):
         query = db.session.query(User.id).join(messenger_areas).filter_by(area_id=oid)
         _messengers = db.session.query(User).filter(~User.id.in_(query)).filter_by(role_id=2).all()
         _municipalities = Municipality.query.all()
-        CONTEXT['module'] = 'bds'
+
+        data = {
+            'messengers': _messengers,
+            'municipalities': _municipalities
+        }
+
         CONTEXT['model'] = 'area'
 
-        return render_template('bds/bds_edit_area.html',context=CONTEXT, messengers=_messengers,\
-            oid=oid, ins=ins, title="Edit area", municipalities=_municipalities)
+        return admin_render_template('bds/area/bds_edit_area.html', 'bds', oid=oid, ins=ins,\
+            title="Edit area", data=data, scripts=scripts, modals=modals)
         
     try:
         ins.name = request.form.get('name')
