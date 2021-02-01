@@ -13,17 +13,17 @@ class Config(object):
 
     CORS_HEADERS = 'Content-Type' # Flask Cors
 
-    # DEVELOPER-NOTE: ADMIN PAGE CONFIGURATIONS HERE
+    # DEVELOPERS-NOTE: ADMIN PAGE CONFIGURATIONS HERE
     ADMIN = {
+        'APPLICATION_NAME': 'Likes',
         'DATA_PER_PAGE': 25,
         'HOME_URL': 'bp_admin.dashboard',
         'DASHBOARD_URL': 'bp_admin.dashboard',
-        'FIRST_SIDEBAR_HEADER': 'ADMINISTRATION',
-        'SECOND_SIDEBAR_HEADER': 'SYSTEM MODELS'
+        'MODELS_SIDEBAR_HEADER': 'SYSTEM MODELS'
     }
     #                 -END-
 
-    # DEVELOPER-NOTE: AUTH CONFIGURATIONS HERE
+    # DEVELOPERS-NOTE: AUTH CONFIGURATIONS HERE
     AUTH = {
         'LOGIN_REDIRECT_URL': 'bp_admin.dashboard',
     }
@@ -33,6 +33,7 @@ class Config(object):
     UPLOAD_IMAGES_FOLDER = basedir + "/bds/static/img/uploads"
     UPLOAD_CSV_FOLDER = basedir + "/bds/static/csv/uploads"
     #                 -END-
+
 
 def _get_database(server):
     load_dotenv()
