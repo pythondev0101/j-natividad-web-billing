@@ -2,11 +2,11 @@ from datetime import datetime
 from flask import redirect, url_for, request, flash, render_template
 from flask_login import login_required
 from app import db, CONTEXT
-from app.admin import admin_render_template
-from app.admin.routes import admin_table
+from app.admin.templating import admin_edit, admin_render_template
+from app.admin.templating import admin_table
 from bds import bp_bds
 from bds.models import SubArea, Subscriber, Area
-from bds.forms import SubAreaForm
+from bds.forms import SubAreEditForm, SubAreaForm
 
 
 
@@ -32,6 +32,7 @@ def sub_areas():
 @bp_bds.route('/sub-areas/create', methods=['GET','POST'])
 @login_required
 def create_sub_area():
+    form = SubAreaForm()
 
     if request.method == "GET":
         _subscribers = Subscriber.query.all()
@@ -42,16 +43,14 @@ def create_sub_area():
             'areas': _areas
         }
 
-        CONTEXT['model'] = 'sub_area'
-
-        return admin_render_template("bds/sub_area/bds_create_sub_area.html", 'bds', title="Create sub area",\
-            data=data, modals=modals, scripts=scripts)
+        return admin_render_template(SubArea, "bds/sub_area/bds_create_sub_area.html", 'bds', form=form,\
+            data=data, modals=modals, scripts=scripts, title="Create sub area")
 
     try:
         new = SubArea()
-        new.name = request.form.get('name')
-        new.description = request.form.get('description')
-        new.area_id = request.form.get('area_id') if not request.form.get('area_id') == '' else None
+        new.name = form.name.data
+        new.description = form.description.data
+        new.area_id = form.area_id.data if form.area_id.data != '' else None
         
         subscribers_line = request.form.getlist('subscribers[]')
         if subscribers_line:
@@ -72,6 +71,7 @@ def create_sub_area():
 @login_required
 def edit_sub_area(oid):
     ins = SubArea.query.get_or_404(oid)
+    form = SubAreEditForm(obj=ins)
 
     if request.method == 'GET':
         _areas = Area.query.all()
@@ -82,13 +82,11 @@ def edit_sub_area(oid):
         data = {
             'subscribers': _subscribers,
             'areas': _areas,
-            'ins': ins
+            'ins_subscribers': ins.subscribers,
         }
 
-        CONTEXT['model'] = 'sub_area'
-
-        return admin_render_template('bds/sub_area/bds_edit_sub_area.html', 'bds', oid=oid,\
-            title="Edit sub area", data=data, modals=modals, scripts=scripts)
+        return admin_render_template(SubArea, 'bds/sub_area/bds_edit_sub_area.html', 'bds', oid=oid, \
+            data=data, modals=modals, scripts=scripts, form=form,title="Edit sub area")
 
     try:
         ins.name = request.form.get('name')

@@ -2,7 +2,7 @@ from datetime import datetime
 from flask import redirect, url_for, request, flash
 from flask_login import current_user, login_required
 from app import db
-from app.admin.routes import admin_table, admin_edit
+from app.admin.templating import admin_table, admin_edit
 from app.auth.models import User
 from bds import bp_bds
 from bds.models import Messenger
@@ -18,10 +18,8 @@ def messengers():
     models = [User]
     query = User.query.with_entities(*fields).filter_by(role_id=2).all()
 
-    return admin_table(*models, fields=fields, list_view_url="bp_bds.messengers",\
-        create_url='bp_bds.create_messenger', edit_url="bp_bds.edit_messenger", form=form,\
-        kwargs={'module': 'bds','model_data':query}
-        )
+    return admin_table(*models, fields=fields, form=form, create_url='bp_bds.create_messenger', \
+        edit_url="bp_bds.edit_messenger", module_name='bds', table_data=query)
 
 
 @bp_bds.route('/messengers/create', methods=['POST'])
@@ -60,8 +58,8 @@ def edit_messenger(oid):
     form = MessengerEditForm(obj=ins)
 
     if request.method == "GET":
-        return admin_edit(form,'bp_bds.edit_messenger',oid, \
-            model=Messenger,template='bds/bds_edit.html', kwargs={'module': 'bds'})
+        return admin_edit(Messenger, form,'bp_bds.edit_messenger',oid, 'bp_bds.messengers',\
+            module_name='bds')
 
     if not form.validate_on_submit():
         for key, value in form.errors.items():

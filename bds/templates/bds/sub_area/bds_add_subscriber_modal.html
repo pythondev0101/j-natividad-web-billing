@@ -22,15 +22,17 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {% for subscriber in data['subscribers'] %}
-                                <tr class="item" id="{{ subscriber.id }}">
-                                    <td style="display:none;">{{ subscriber.id }}</td>
-                                    <td><input class="chkbox" type="checkbox"></td>
-                                    <td>{{subscriber.fname}}</td>
-                                    <td>{{subscriber.lname}}</td>
-                                    <td>{{subscriber.address}}</td>
-                                </tr>
-                                {% endfor %}
+
+                                    {% for subscriber in data['subscribers'] %}
+                                    <tr class="item" id="{{ subscriber.id }}">
+                                        <td style="display:none;">{{ subscriber.id }}</td>
+                                        <td><input class="chkbox" type="checkbox"></td>
+                                        <td>{{subscriber.fname}}</td>
+                                        <td>{{subscriber.lname}}</td>
+                                        <td>{{subscriber.address}}</td>
+                                    </tr>
+                                    {% endfor %}
+                                    
                                 </tbody>
                             </table>
                         </div>

@@ -2,11 +2,11 @@ from flask import redirect, url_for, request, flash, render_template
 from flask_login import login_required
 from app import db, CONTEXT
 from app.admin.templating import admin_render_template
-from app.admin.routes import admin_table
+from app.admin.templating import admin_table
 from app.auth.models import User
 from bds import bp_bds
 from bds.models import Area, Municipality
-from bds.forms import AreaForm
+from bds.forms import AreaEditForm, AreaForm
 
 
 
@@ -18,13 +18,15 @@ modals = [
     "bds/area/bds_add_messenger_modal.html"
 ]
 
+
 @bp_bds.route('/areas')
 @login_required
 def areas():
-    fields = [Area.id,Area.name, Area.description, Area.created_at, Area.updated_at]
+    models = [Area, Municipality]
+    fields = [Area.id,Area.name, Area.description, Municipality.name, Area.created_at, Area.updated_at]
     form = AreaForm()
 
-    return admin_table(Area, fields=fields,form=form, create_url='bp_bds.create_area',\
+    return admin_table(*models, fields=fields,form=form, create_url='bp_bds.create_area',\
         create_button=True, edit_url="bp_bds.edit_area", create_modal=False)
 
 
@@ -41,15 +43,14 @@ def create_area():
             'municipalities': _municipalities
         }
 
-        CONTEXT['model'] = 'area'
-        return admin_render_template("bds/area/bds_create_area.html", 'bds', title="Create area",\
+        return admin_render_template(Area, "bds/area/bds_create_area.html", 'bds', title="Create area",\
             data=data, modals=modals, scripts=scripts)
 
     try:
         new = Area()
-        new.name = request.form.get('name')
-        new.description = request.form.get('description')
-        new.municipality_id = request.form.get('municipality_id', None)
+        new.name = request.form.get('name', '')
+        new.description = request.form.get('description', '')
+        new.municipality_id = request.form.get('municipality_id') if request.form.get('municipality_id') != '' else None
 
         messengers_line = request.form.getlist('messengers[]')
         if messengers_line:
@@ -72,9 +73,8 @@ def create_area():
 def edit_area(oid):
     from app.auth.models import messenger_areas
 
-
     ins = Area.query.get_or_404(oid)
-
+    form = AreaEditForm(obj=ins)
     if request.method == 'GET':
         
         query = db.session.query(User.id).join(messenger_areas).filter_by(area_id=oid)
@@ -86,15 +86,13 @@ def edit_area(oid):
             'municipalities': _municipalities
         }
 
-        CONTEXT['model'] = 'area'
-
-        return admin_render_template('bds/area/bds_edit_area.html', 'bds', oid=oid, ins=ins,\
+        return admin_render_template(Area, 'bds/area/bds_edit_area.html', 'bds', oid=oid, ins=ins,form=form,\
             title="Edit area", data=data, scripts=scripts, modals=modals)
         
     try:
-        ins.name = request.form.get('name')
-        ins.description = request.form.get('description')
-        ins.municipality_id = request.form.get('municipality_id', None)
+        ins.name = request.form.get('name', '')
+        ins.description = request.form.get('description', '')
+        ins.municipality_id = request.form.get('municipality_id') if request.form.get('municipality_id') != '' else None
         messengers_line = request.form.getlist('messengers[]')
         ins.messengers = []
         

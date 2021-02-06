@@ -33,7 +33,7 @@
                                 <div class="position-relative form-group">
                                     <label for="name" class="">Name</label>
                                     <input name="name" id="name" type="text" class="form-control input_required"
-                                        required value="{{ins.name}}">
+                                        required value="{{form.name.data}}">
                                     <div class="valid-feedback">
                                         Looks good!
                                     </div>
@@ -46,7 +46,7 @@
                                 <div class="position-relative form-group">
                                     <label for="description" class="">Description</label>
                                     <input name="description" id="description" type="text" class="form-control"
-                                        value="{{ins.description}}">
+                                        value="{% if not form.description.data == None %}{{form.description.data}}{% endif %}">
                                     <div class="valid-feedback">
                                         Looks good!
                                     </div>
@@ -60,7 +60,7 @@
                             <div class="col-md-6">
                                 <div class="position-relative form-group">
                                     <label for="municipality_id" class="">Municipality</label>
-                                    <select name="municipality_id" id="municipality_id" class="form-control input_required" required>
+                                    <select name="municipality_id" id="municipality_id" class="form-control input_required">
                                         <option value="">Choose...</option>
                                         {% for municipality in data['municipalities'] %}
                                         <option value="{{ municipality.id }}" {% if ins.municipality_id==municipality.id %}selected{% endif %}>

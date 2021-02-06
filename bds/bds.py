@@ -7,7 +7,7 @@ from .models import (Delivery, Area, Subscriber, Messenger, SubArea, Municipalit
 class BDSModule(CoreModule):
     module_name = 'bds'
     module_icon = 'fa-map'
-    module_link = 'bp_bds.dashboard'
+    module_link = 'bp_bds.delivery_map'
     module_short_description = 'BDS'
     module_long_description = "Billing Delivery System"
     models = [

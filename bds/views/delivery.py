@@ -2,14 +2,20 @@ from flask import (url_for, request,jsonify, session, abort)
 from flask_login import login_required
 from sqlalchemy import or_
 from app import db, CONTEXT, csrf
-from app.admin import admin_render_template
+from app.admin.templating import admin_render_template
 from bds import bp_bds
 from bds.models import Delivery, SubArea, Municipality, Subscriber, Area
 
 
+
+scripts = [
+    {'bp_bds.static': 'js/delivery.js'}
+]
+
 modals = [
     'bds/bds_details_modal.html',
 ]
+
 
 @bp_bds.route('/deliveries',methods=['GET'])
 @login_required
@@ -18,11 +24,8 @@ def deliveries():
     _sub_areas = SubArea.query.all()
     _municipalities = Municipality.query.all()
     
-    CONTEXT['model'] = 'delivery'
-    CONTEXT['active'] = 'delivery'
-
-    return admin_render_template('bds/bds_delivery.html', 'bds', title="Delivery",\
-        subAreas=_sub_areas, municipalities=_municipalities, modals=modals)
+    return admin_render_template(Delivery, 'bds/bds_delivery.html', 'bds', title="Delivery",\
+        subAreas=_sub_areas, municipalities=_municipalities, modals=modals, scripts=scripts)
 
 
 @bp_bds.route('/api/get-sub-area-subscribers')
@@ -77,7 +80,7 @@ def get_sub_area_subscribers():
         'data': data
     }
 
-    session['current_sub_area'] = sub_area.name
+    # session['current_sub_area'] = sub_area.name
 
     return jsonify(result)
 
@@ -251,13 +254,13 @@ def get_municipality_areas():
             'description': area.description
         })
 
-    session['current_municipality'] = municipality.name
+    # session['current_municipality'] = municipality.name
 
-    if session.get('current_area', False):
-        session.pop('current_area')
+    # if session.get('current_area', False):
+    #     session.pop('current_area')
 
-    if session.get('current_sub_area', False):
-        session.pop('current_sub_area')
+    # if session.get('current_sub_area', False):
+    #     session.pop('current_sub_area')
 
     return jsonify({'result': data})
 
@@ -281,9 +284,28 @@ def get_area_sub_areas():
             'description': sub_area.description
         })
     
-    session['current_area'] = area.name
+    # session['current_area'] = area.name
 
-    if session.get('current_sub_area', False):
-        session.pop('current_sub_area')
+    # if session.get('current_sub_area', False):
+    #     session.pop('current_sub_area')
 
     return jsonify({'result': data})
+
+
+@bp_bds.route('/api/municipalities', methods=["GET"])
+@csrf.exempt
+def get_municipalities():
+    municipalities = Municipality.query.all()
+    _municipalities_list = []
+
+    for municipality in municipalities:
+
+        _municipalities_list.append({
+            'id': municipality.id,
+            'name': municipality.name,
+            'description': municipality.description
+        })
+
+    response = jsonify(_municipalities_list)
+
+    return response, 200

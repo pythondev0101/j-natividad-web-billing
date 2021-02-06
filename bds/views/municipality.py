@@ -2,7 +2,7 @@ from datetime import datetime
 from flask import redirect, url_for, request, current_app, flash
 from flask_login import current_user, login_required
 from app import db
-from app.admin.routes import admin_table, admin_edit
+from app.admin.templating import admin_table, admin_edit
 from bds import bp_bds
 from bds.models import Municipality
 from bds.forms import MunicipalityForm, MunicipalityEditForm
@@ -51,7 +51,7 @@ def edit_municipality(oid):
     form = MunicipalityEditForm(obj=ins)
 
     if request.method == "GET":
-        return admin_edit(form,'bp_bds.edit_municipality',oid, model=Municipality)
+        return admin_edit(Municipality, form,'bp_bds.edit_municipality', oid, 'bp_bds.municipalities')
 
     if not form.validate_on_submit():
         for key, value in form.errors.items():

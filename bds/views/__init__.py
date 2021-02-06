@@ -1,4 +1,4 @@
 from . import (
-    dashboard, reports, delivery, municipality, area, sub_area,
+    map, reports, delivery, municipality, area, sub_area,
     messenger, subscriber
 )

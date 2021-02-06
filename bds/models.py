@@ -9,7 +9,7 @@ class Subscriber(Base, Admin):
     __amname__ = 'subscriber'
     __amdescription__ = 'Subscribers'
     __amicon__ = 'pe-7s-users'
-    __list_view_url__ = 'bp_bds.subscribers'
+    __view_url__ = 'bp_bds.subscribers'
 
     """ COLUMNS """
     fname = db.Column(db.String(64), nullable=True)
@@ -35,7 +35,7 @@ class Delivery(Base, Admin):
     __amname__ = 'delivery'
     __amdescription__ = 'Deliveries'
     __amicon__ = 'pe-7s-paper-plane'
-    __list_view_url__ = 'bp_bds.deliveries'
+    __view_url__ = 'bp_bds.deliveries'
     
     """ COLUMNS """
     subscriber_id = db.Column(db.Integer, db.ForeignKey('bds_subscribers.id', ondelete="SET NULL"), nullable=True)
@@ -62,9 +62,9 @@ class Area(Base, Admin):
     __amdescription__ = 'Locations'
     __amicon__ = 'pe-7s-flag'
     __amfunctions__ = [
-        {"Sub Areas": "bp_bds.sub_areas"},
-        {"Areas": "bp_bds.areas"},
-        {"Municipalities": "bp_bds.municipalities"},
+        ("Sub Areas", "bp_bds.sub_areas", 'sub_area'),
+        ("Areas", "bp_bds.areas", 'area'),
+        ("Municipalities", "bp_bds.municipalities", 'municipality'),
         ]
 
     """ COLUMNS """
@@ -95,7 +95,7 @@ class Messenger(db.Model, Admin):
     __amname__ = 'user'
     __amdescription__ = 'Messengers'
     __amicon__ = 'pe-7s-car'
-    __list_view_url__ = 'bp_bds.messengers'
+    __view_url__ = 'bp_bds.messengers'
 
 
 class Municipality(Base, Admin):
@@ -113,4 +113,4 @@ class DeliveryMap(Admin):
     __amname__ = 'delivery_map'
     __amdescription__ = 'Delivery Map'
     __amicon__ = 'pe-7s-map-2'
-    __list_view_url__ = 'bp_bds.dashboard'
+    __view_url__ = 'bp_bds.delivery_map'

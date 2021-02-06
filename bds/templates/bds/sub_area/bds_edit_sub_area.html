@@ -33,7 +33,7 @@
                                 <div class="position-relative form-group">
                                     <label for="name" class="">Name</label>
                                     <input name="name" id="name" type="text" class="form-control input_required"
-                                        required value="{{data['ins'].name}}">
+                                        required value="{{form.name.data}}">
                                     <div class="valid-feedback">
                                         Looks good!
                                     </div>
@@ -46,7 +46,7 @@
                                 <div class="position-relative form-group">
                                     <label for="description" class="">Description</label>
                                     <input name="description" id="description" type="text" class="form-control"
-                                        value="{{data['ins'].description}}">
+                                        value="{{form.description.data}}">
                                     <div class="valid-feedback">
                                         Looks good!
                                     </div>
@@ -58,10 +58,10 @@
                             <div class="col-md-6">
                                 <div class="position-relative form-group">
                                     <label for="area_id" class="">Area</label>
-                                    <select name="area_id" id="area_id" class="form-control input_required" required>
+                                    <select name="area_id" id="area_id" class="form-control input_required">
                                         <option value="">Choose...</option>
                                         {% for area in data['areas'] %}
-                                        <option value="{{ area.id }}" {% if data['ins'].area_id == area.id %}selected{% endif %}>
+                                        <option value="{{ area.id }}" {% if form.area_id.data == area.id %}selected{% endif %}>
                                             {{ area.name }}
                                         </option>
                                         {% endfor %}
@@ -93,7 +93,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {% for subscriber in data['ins'].subscribers %}
+                                        {% for subscriber in data['ins_subscribers'] %}
                                         <tr>
                                             <td style="display:none;"><input name="subscribers[]" type="hidden"
                                                     value="{{subscriber.id}}"></td>
