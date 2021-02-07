@@ -12,7 +12,7 @@ def install():
         print("Installation failed!")
         return False
 
-    if Role.query.count() < 1:
+    if Role.query.count() <= 1:
         role = Role()
         role.name = "Messengers"
         db.session.add(role)
