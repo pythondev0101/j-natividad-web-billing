@@ -81,11 +81,3 @@ app_config = {
     'production': ProductionConfig,
     'testing': TestingConfig
 }
-
-
-class HomeBestConfig:
-    load_dotenv()
-    HOST = "localhost"
-    USER = "root"
-    PASSWORD = "db_password"
-    DATABASE = "db_bds"
