@@ -41,7 +41,7 @@ def _get_database(server):
     host = "localhost"
     user = "root"
     password = "db_password"
-    database = "db_bds"
+    database = "db_bds_generic"
     if server == 'pythonanywhere':
         return "mysql://{}:{}@{}/{}".format(user,password,host,database)
     else:
