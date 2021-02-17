@@ -20,7 +20,8 @@ def get_subscribers():
         _messenger_id = request.args.get('messenger_id')
         messenger = User.query.get_or_404(_messenger_id)
         query = db.session.query(Area.id).join(messenger_areas).filter_by(messenger_id=messenger.id)
-        subscribers = db.session.query(Subscriber).join(SubArea).filter(SubArea.id.in_(query)).all()
+        _sub_areas_query = db.session.query(SubArea.id).join(Area).filter(SubArea.area_id.in_(query))
+        subscribers = db.session.query(Subscriber).join(SubArea).filter(SubArea.id.in_(_sub_areas_query)).all()
     else:
         subscribers = Subscriber.query.all()
 
