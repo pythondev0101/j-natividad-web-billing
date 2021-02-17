@@ -28,6 +28,8 @@ $(document).ready(function(){
         var sessMunicipality = localStorage.getItem('sessMunicipality');
         var sessArea = localStorage.getItem('sessArea');
         var sessSubArea = localStorage.getItem('sessSubArea');
+        var sessSubAreaID = localStorage.getItem('sessSubAreaID');
+        $("#btnSubAreaLabel").val(sessSubAreaID);
 
         getMunicipalities();
 
@@ -49,6 +51,10 @@ $(document).ready(function(){
                 btnSubAreaLabel.html(sessSubArea.toUpperCase());
             }
 
+        }
+
+        if(!(sessSubAreaID)){
+            $("#btnSubAreaLabel").val(0);
         }
         
     }
@@ -114,7 +120,7 @@ $(document).ready(function(){
 
                 if(data.result.length>0){
                     for(i=0; i < data.result.length; ++i){
-                       divSubAreaButtons.append(`<button type="button" tabindex="0" class="dropdown-item btn-sub-area">${data.result[i].name}</button>`);
+                       divSubAreaButtons.append(`<button value="${data.result[i].id}" type="button" tabindex="0" class="dropdown-item btn-sub-area">${data.result[i].name}</button>`);
                     }
                 } else{
                     divSubAreaButtons.append(`
@@ -163,9 +169,9 @@ $(document).ready(function(){
             }
         ],
         ajax:{
-            url:"/bds/api/get-sub-area-subscribers",
+            url:"/bds/api/sub-areas/" + $("#btnSubAreaLabel").val() + "/subscribers",
             data: function(d) {
-                d.sub_area_name = $("#btnSubAreaLabel").html().trim();
+                //d.sub_area_name = 
             }
         }
     });
@@ -216,10 +222,12 @@ $(document).ready(function(){
 
         // if(!(localStorage.getItem('sessSubArea') == _sub_area_name)){
         $("#btnSubAreaLabel").html(_sub_area_name.toUpperCase());
-        
+        $("#btnSubAreaLabel").val($(this).val());
+
+        localStorage.setItem('sessSubAreaID', $(this).val());
         localStorage.setItem('sessSubArea', _sub_area_name);
     
-        dtbl_subscribers.ajax.reload();
+        dtbl_subscribers.ajax.url(`/bds/api/sub-areas/${$(this).val()}/subscribers`).load();
         // }
         
     });

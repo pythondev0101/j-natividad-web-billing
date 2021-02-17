@@ -28,63 +28,6 @@ def deliveries():
         subAreas=_sub_areas, municipalities=_municipalities, modals=modals, scripts=scripts)
 
 
-@bp_bds.route('/api/get-sub-area-subscribers')
-@csrf.exempt
-def get_sub_area_subscribers():
-
-    _sub_area_name = request.args.get('sub_area_name')
-    sub_area = SubArea.query.filter_by(name=_sub_area_name).first()
-
-    draw = request.args.get('draw')
-    start, length = request.args.get('start'), request.args.get('length')
-    search_value = "%" + request.args.get("search[value]") + "%"
-     
-    if not sub_area:
-        return jsonify({'data':[],'recordsTotal':0,'recordsFiltered':0,'draw':draw})
-
-
-    if search_value == "":
-        query = Subscriber.query.filter_by(sub_area_id=sub_area.id)
-    else:
-        query = Subscriber.query.filter_by(sub_area_id=sub_area.id)\
-            .filter(or_(Subscriber.lname.like(search_value),Subscriber.contract_number.like(search_value)))
-
-    subscribers = query.limit(length).offset(start).all()
-    total_records = query.count()
-
-    data = []
-
-    for subscriber in subscribers:
-
-        delivery = Delivery.query.filter_by(subscriber_id=subscriber.id,active=1).first()
-
-        _status = ""
-
-        if delivery:
-            _status = delivery.status
-        else:
-            _status = "NOT YET DELIVERED"
-
-        data.append([
-            subscriber.contract_number,
-            subscriber.fname + " " + subscriber.lname,
-            subscriber.address,
-            _status,
-            ""
-        ])
-    
-    result = {
-        'draw': draw,
-        'recordsTotal': total_records,
-        'recordsFiltered': total_records,
-        'data': data
-    }
-
-    # session['current_sub_area'] = sub_area.name
-
-    return jsonify(result)
-
-
 @bp_bds.route('/api/deliveries/<string:contract_number>', methods=['GET'])
 @csrf.exempt
 def get_delivery(contract_number):

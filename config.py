@@ -9,7 +9,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 class Config(object):
     load_dotenv()
 
-    SECRET_KEY = "72d3e92e06474a69bd44dd6733f59722"
+    SECRET_KEY = os.environ.get('SECRET_KEY') # Key
 
     CORS_HEADERS = 'Content-Type' # Flask Cors
 
@@ -38,10 +38,10 @@ class Config(object):
 def _get_database(server):
     load_dotenv()
 
-    host = "localhost"
-    user = "root"
-    password = "db_password"
-    database = "db_bds"
+    host = os.environ.get('DATABASE_HOST')
+    user = os.environ.get('DATABASE_USER')
+    password = os.environ.get('DATABASE_PASSWORD')
+    database = os.environ.get('DATABASE_NAME')
     if server == 'pythonanywhere':
         return "mysql://{}:{}@{}/{}".format(user,password,host,database)
     else:
@@ -81,11 +81,3 @@ app_config = {
     'production': ProductionConfig,
     'testing': TestingConfig
 }
-
-
-class HomeBestConfig:
-    load_dotenv()
-    HOST = "localhost"
-    USER = "root"
-    PASSWORD = "db_password"
-    DATABASE = "db_bds"
