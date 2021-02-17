@@ -83,14 +83,13 @@ def get_deliveries():
         _messenger_id = request.args.get('messenger_id')
         messenger = User.query.get_or_404(_messenger_id)
         query = db.session.query(Area.id).join(messenger_areas).filter_by(messenger_id=messenger.id)
-        deliveries = db.session.query(Delivery).filter_by(active=1).join(Subscriber).join(SubArea).filter(SubArea.id.in_(query)).all()
+        print(query.all())
+        _sub_areas_query = db.session.query(SubArea.id).join(Area).filter(SubArea.area_id.in_(query))
+        print(_sub_areas_query.all())
+        deliveries = db.session.query(Delivery).filter_by(active=1).join(Subscriber).join(SubArea).filter(SubArea.id.in_(_sub_areas_query)).all()
     else:
         deliveries = Delivery.query.filter_by(active=1).all()
 
-    print(_query)
-    print(_messenger_id)
-    print(db.session.query(Delivery).filter_by(active=1).join(Subscriber).join(SubArea).filter(SubArea.id.in_(query)))
-    print(deliveries)
     # SERIALIZE MODELS
     _list = []
     for delivery in deliveries:
