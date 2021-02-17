@@ -1,7 +1,7 @@
-from datetime import datetime
-from flask import redirect, url_for, request, flash, render_template
+from flask import redirect, url_for, request, flash, jsonify
 from flask_login import login_required
-from app import db, CONTEXT
+from sqlalchemy import or_
+from app import db
 from app.admin.templating import admin_edit, admin_render_template
 from app.admin.templating import admin_table
 from bds import bp_bds
@@ -11,7 +11,8 @@ from bds.forms import SubAreEditForm, SubAreaForm
 
 
 scripts = [
-    {"bp_bds.static": "js/sub_area.js"}
+    {"bp_bds.static": "js/sub_area.js"},
+    {"bp_bds.static": "js/sub_area_mdl_subscribers.js"}
 ]
 
 modals = [
@@ -74,19 +75,9 @@ def edit_sub_area(oid):
     form = SubAreEditForm(obj=ins)
 
     if request.method == 'GET':
-        _areas = Area.query.all()
-        
-        query = db.session.query(Subscriber.id).filter_by(sub_area_id=oid)
-        _subscribers = db.session.query(Subscriber).filter(~Subscriber.id.in_(query)).all()
-        
-        data = {
-            'subscribers': _subscribers,
-            'areas': _areas,
-            'ins_subscribers': ins.subscribers,
-        }
 
-        return admin_render_template(SubArea, 'bds/sub_area/bds_edit_sub_area.html', 'bds', oid=oid, \
-            data=data, modals=modals, scripts=scripts, form=form,title="Edit sub area")
+        return admin_edit(SubArea, form, 'bp_bds.edit_sub_area', oid, 'bp_bds.sub_areas', \
+            modals=modals, scripts=scripts)
 
     try:
         ins.name = request.form.get('name')
@@ -107,3 +98,28 @@ def edit_sub_area(oid):
         flash(str(exc), 'error')
     
     return redirect(url_for('bp_bds.sub_areas'))
+
+
+@bp_bds.route('/api/dtbl/subscribers')
+def get_dtbl_subscribers():
+    _sub_area_id = request.args.get('sub_area_id')
+    query0 = db.session.query(Subscriber.id).filter_by(sub_area_id=_sub_area_id)
+    
+    subscribers = db.session.query(Subscriber).filter(~Subscriber.id.in_(query0)).all()
+
+    data = []
+
+    for subscriber in subscribers:
+        data.append([
+            subscriber.id,
+            subscriber.contract_number,
+            subscriber.fname,
+            subscriber.lname,
+            subscriber.sub_area.name if subscriber.sub_area else ''
+        ])
+    
+    response = {
+        'data': data
+    }
+
+    return jsonify(response)

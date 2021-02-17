@@ -11,28 +11,18 @@
                 <div class="modal-body">
                     <div class="main-card mb-3 card">
                         <div class="card-body">
-                            <table style="width:100%;" id="tbl_subscribers" class="mb-0 table table-sm">
+                            <table id="tbl_mdl_subscribers" style="width:100%;" class="mb-0 table table-sm">
                                 <thead>
                                 <tr>
-                                    <th style="display:none;">ID</th>
                                     <th>ADD</th>
+                                    <th>CONTRACT NO.</th>
                                     <th>FIRST NAME</th>
                                     <th>LAST NAME</th>
-                                    <th>ADDRESS</th>
+                                    <th>SUB AREA</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-
-                                    {% for subscriber in data['subscribers'] %}
-                                    <tr class="item" id="{{ subscriber.id }}">
-                                        <td style="display:none;">{{ subscriber.id }}</td>
-                                        <td><input class="chkbox" type="checkbox"></td>
-                                        <td>{{subscriber.fname}}</td>
-                                        <td>{{subscriber.lname}}</td>
-                                        <td>{{subscriber.address}}</td>
-                                    </tr>
-                                    {% endfor %}
-                                    
+                                     <!-- load with ajax -->
                                 </tbody>
                             </table>
                         </div>

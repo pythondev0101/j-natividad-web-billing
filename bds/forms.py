@@ -8,7 +8,6 @@ from wtforms import StringField
 class SubscriberForm(AdminTableForm):
     from .models import SubArea
 
-
     __table_columns__ = ['First name','Last name', 'Created at', 'updated at']
     __heading__ = "Subscribers"
 
@@ -29,9 +28,10 @@ class SubscriberForm(AdminTableForm):
 
 
 class DeliveriesInlineForm(AdminInlineForm):
-    headers = ['Delivery id','Delivery Date','Date Delivered', 'Delivered By', 'Status', 'Actions']
-    title = "Billings"
-    html = 'bds/subscriber/deliveries_inline.html'
+    __table_id__ = 'tbl_inline_billings'
+    __table_columns__ = ['Delivery id','Delivery Date','Date Delivered', 'Delivered By', 'Status', 'Actions']
+    __title__ = "Billings"
+    __html__ = 'bds/subscriber/deliveries_inline.html'
 
 
 class SubscriberEditForm(AdminEditForm):
@@ -94,6 +94,26 @@ class MessengerEditForm(AdminEditForm):
         return [[self.fname, self.lname],[self.username,self.email], [self.is_admin]]
 
 
+class SubAreaSubscriberInline(AdminInlineForm):
+    __table_id__ = 'tbl_inline_subscribers'
+    __table_columns__ = ['','Contract No.','first name','last name','Current Sub area']
+    __title__ = "Subscribers"
+    __html__ = None
+
+    @property
+    def buttons(self):
+        _remove_button = """<button id="btn_delete_subscriber" type="button" 
+                            class="mr-2 btn-icon btn-icon-only btn btn-outline-danger">
+                            <i class="pe-7s-trash btn-icon-wrapper"> </i></button>
+                        """
+        _add_button = """<button type="button" class="btn-wide btn btn-success" data-toggle="modal" 
+                            data-target="#add_subscriber_modal" data-placement="bottom">Add</button>
+                            """
+        return [
+            _remove_button, _add_button
+        ]
+
+
 class SubAreaForm(AdminTableForm):
     from .models import Area
 
@@ -116,12 +136,13 @@ class SubAreaForm(AdminTableForm):
 class SubAreEditForm(AdminEditForm):
     from .models import Area
 
-
     __heading__ = "Sub areas"
 
     name = AdminField(label="Name",validators=[DataRequired()])
     description = AdminField(label="Description", required=False)
     area_id = AdminField(label="Area", validators=[DataRequired()], model=Area)
+
+    subscribers_inline = SubAreaSubscriberInline()
 
     @property
     def fields(self):
@@ -129,6 +150,10 @@ class SubAreEditForm(AdminEditForm):
             [self.name, self.description],
             [self.area_id]
         ]
+
+    @property
+    def inlines(self):
+        return [self.subscribers_inline]
 
 
 class AreaForm(AdminTableForm):

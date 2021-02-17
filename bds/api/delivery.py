@@ -87,6 +87,10 @@ def get_deliveries():
     else:
         deliveries = Delivery.query.filter_by(active=1).all()
 
+    print(_query)
+    print(_messenger_id)
+    print(db.session.query(Delivery).filter_by(active=1).join(Subscriber).join(SubArea).filter(SubArea.id.in_(query)))
+    print(deliveries)
     # SERIALIZE MODELS
     _list = []
     for delivery in deliveries:
