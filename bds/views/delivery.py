@@ -1,35 +1,35 @@
-from flask import (url_for, request,jsonify, session, abort)
+from bds.views.billing import billings
+from flask import (json, url_for, request,jsonify, abort)
 from flask_login import login_required
-from sqlalchemy import or_
-from app import db, CONTEXT, csrf
+from flask_cors import cross_origin
+from app import db, csrf
 from app.admin.templating import admin_render_template
 from bds import bp_bds
-from bds.models import Delivery, SubArea, Municipality, Subscriber, Area
+from bds.models import Billing, Delivery, SubArea, Municipality, Subscriber, Area
 
 
 
 scripts = [
-    {'bp_bds.static': 'js/delivery.js'}
+    {'bp_bds.static': 'js/delivery.js'},
+    {'bp_bds.static': 'js/delivery_mdl_billing.js'}
 ]
 
 modals = [
-    'bds/bds_details_modal.html',
+    'bds/delivery/bds_details_modal.html',
+    'bds/delivery/bds_search_billing_modal.html'
 ]
 
 
 @bp_bds.route('/deliveries',methods=['GET'])
 @login_required
 def deliveries():
-
-    _sub_areas = SubArea.query.all()
-    _municipalities = Municipality.query.all()
     
-    return admin_render_template(Delivery, 'bds/bds_delivery.html', 'bds', title="Delivery",\
-        subAreas=_sub_areas, municipalities=_municipalities, modals=modals, scripts=scripts)
+    return admin_render_template(Delivery, 'bds/delivery/bds_delivery.html', 'bds', title="Delivery",\
+        modals=modals, scripts=scripts)
 
 
 @bp_bds.route('/api/deliveries/<string:contract_number>', methods=['GET'])
-@csrf.exempt
+@cross_origin()
 def get_delivery(contract_number):
 
     _sub_area_name = request.args['sub_area_name']
@@ -68,7 +68,7 @@ def get_delivery(contract_number):
 
 
 @bp_bds.route('/api/delivery/<int:delivery_id>/confirm', methods=['POST'])
-@csrf.exempt
+@cross_origin()
 def confirm_delivery_id(delivery_id):
 
     delivery = Delivery.query.get_or_404(delivery_id)
@@ -82,14 +82,12 @@ def confirm_delivery_id(delivery_id):
 
     return jsonify({
         'result':True, 
-        'delivery': {
-            'id': delivery.id,
-        }
+        'delivery': {'id': delivery.id,}
         })
 
 
 @bp_bds.route('/api/subscriber/delivery/reset', methods=["POST"])
-@csrf.exempt
+@cross_origin()
 def reset():
     _subscriber_contract_no = request.json['subscriber_contract_no']
     _sub_area_name = request.json['sub_area_name']
@@ -108,30 +106,29 @@ def reset():
     return jsonify({'result':True})
 
 
-@bp_bds.route('/api/subscriber/delivery/deliver', methods=['POST'])
-@csrf.exempt
-def deliver():
-    _subscriber_contract_no = request.json['subscriber_contract_no']
-    _sub_area_name = request.json['sub_area_name']
-    print(_sub_area_name)
-    sub_area = SubArea.query.filter_by(name=_sub_area_name).first()
+@bp_bds.route('/api/subscribers/<int:subscriber_id>/deliveries/deliver', methods=['POST'])
+@cross_origin()
+def deliver(subscriber_id):
+    billing_id = request.json['billing_id']
     
-    delivery = Delivery.query.filter_by(active=1).join(Subscriber)\
-        .filter_by(contract_number=_subscriber_contract_no, sub_area_id=sub_area.id).first()
+    delivery = Delivery.query.filter_by(
+        subscriber_id=subscriber_id, billing_id=billing_id, active=1
+        ).first()
 
-    if delivery:
-        pass
-    else:
-        subscriber = Subscriber.query.filter_by(contract_number=_subscriber_contract_no).first()
-        new = Delivery(subscriber.id, "IN-PROGRESS")
+    if not delivery:
+        new = Delivery(subscriber_id, "IN-PROGRESS")
+        new.billing_id = billing_id
+
         db.session.add(new)
         db.session.commit()
 
-    return jsonify({'result':True})
+    response = jsonify({'result':True})
+
+    return response
 
 
 @bp_bds.route('/api/deliveries/reset-all', methods=['POST'])
-@csrf.exempt
+@cross_origin()
 def reset_all():
     _sub_area_name = request.json['sub_area_name']
     sub_area = SubArea.query.filter_by(name=_sub_area_name).first()
@@ -150,37 +147,34 @@ def reset_all():
 
 
 @bp_bds.route('/api/deliveries/deliver-all', methods=['POST'])
-@csrf.exempt
+@cross_origin()
 def deliver_all():
-
+    billing_id = request.json['billing_id']
     _sub_area_name = request.json['sub_area_name']
-    print(_sub_area_name)
     sub_area = SubArea.query.filter_by(name=_sub_area_name).first()
 
-    if sub_area:
-        print("!!!!")
-        for subscriber in sub_area.subscribers:
+    if not sub_area:
+        abort(404)
 
-            delivery = Delivery.query.filter_by(subscriber_id=subscriber.id,active=1).first()
-            if delivery:
-                pass
-            #     if deliver.status == "DELIVERED":
-            #         pass
-            #     elif deliver.status == "IN-PROGRESS":
-            #         pass
-            #     elif deliver.status == "PENDING":
-            #         pass
+    for subscriber in sub_area.subscribers:
+        delivery = Delivery.query.filter_by(
+            subscriber_id=subscriber.id, billing_id=billing_id, active=1
+            ).first()
+        
+        if not delivery:
+            new = Delivery(subscriber.id,"IN-PROGRESS")
+            new.billing_id = billing_id
 
-            else:
-                new = Delivery(subscriber.id,"IN-PROGRESS")
-                db.session.add(new)
-                db.session.commit()
+            db.session.add(new)
+            db.session.commit()
 
-    return jsonify({'result': True})
+    response = jsonify({'result': True})
+
+    return response
 
 
 @bp_bds.route('/api/get-municipality-areas', methods=["GET"])
-@csrf.exempt
+@cross_origin()
 def get_municipality_areas():
 
     _municipality_name = request.args.get('municipality_name')
@@ -197,19 +191,11 @@ def get_municipality_areas():
             'description': area.description
         })
 
-    # session['current_municipality'] = municipality.name
-
-    # if session.get('current_area', False):
-    #     session.pop('current_area')
-
-    # if session.get('current_sub_area', False):
-    #     session.pop('current_sub_area')
-
     return jsonify({'result': data})
 
 
 @bp_bds.route('/api/get-area-sub-areas', methods=["GET"])
-@csrf.exempt
+@cross_origin()
 def get_area_sub_areas():
 
     _area_name = request.args.get('area_name')
@@ -226,29 +212,51 @@ def get_area_sub_areas():
             'name': sub_area.name,
             'description': sub_area.description
         })
-    
-    # session['current_area'] = area.name
-
-    # if session.get('current_sub_area', False):
-    #     session.pop('current_sub_area')
 
     return jsonify({'result': data})
 
 
 @bp_bds.route('/api/municipalities', methods=["GET"])
-@csrf.exempt
+@cross_origin()
 def get_municipalities():
     municipalities = Municipality.query.all()
-    _municipalities_list = []
+
+    _data = []
 
     for municipality in municipalities:
 
-        _municipalities_list.append({
+        _data.append({
             'id': municipality.id,
             'name': municipality.name,
             'description': municipality.description
         })
 
-    response = jsonify(_municipalities_list)
+    response = jsonify(_data)
 
     return response, 200
+
+
+@bp_bds.route('/api/dtbl/billings', methods=['GET'])
+@cross_origin()
+def get_dtbl_billings():
+
+    billings = Billing.query.all()
+
+    _data = []
+
+    for billing in billings:
+        _data.append([
+            billing.id,
+            billing.number,
+            billing.name,
+            billing.date_from,
+            billing.date_to,
+        ])
+
+    response = {
+        'data': _data
+        }
+
+    print(response)
+
+    return jsonify(response)

@@ -1,3 +1,4 @@
+from bds.views.delivery import deliver
 from flask import (jsonify, request, abort)
 from flask_cors import cross_origin
 from sqlalchemy import or_
@@ -23,6 +24,7 @@ def get_sub_area_subscribers(oid):
         start, length = request.args.get('start'), request.args.get('length')
         search_value = "%" + request.args.get("search[value]") + "%"
         column_order = request.args.get('column_order')
+        billing_id = request.args.get('billing_id')
 
         if not sub_area:
             return jsonify({'data':[],'recordsTotal':0,'recordsFiltered':0,'draw':draw})
@@ -34,11 +36,14 @@ def get_sub_area_subscribers(oid):
                 .filter(or_(Subscriber.lname.like(search_value),Subscriber.contract_number.like(search_value)))
 
         subscribers = query.limit(length).offset(start).all()
+
         total_records = query.count()
 
         for subscriber in subscribers:
 
-            delivery = Delivery.query.filter_by(subscriber_id=subscriber.id,active=1).first()
+            delivery = Delivery.query.filter_by(
+                billing_id=billing_id,subscriber_id=subscriber.id,active=1
+                ).first()
 
             _status = ""
 
@@ -55,9 +60,9 @@ def get_sub_area_subscribers(oid):
                     subscriber.lname,
                     subscriber.sub_area.name if subscriber.sub_area else ''
                 ])
-                
             else:
                 data.append([
+                    subscriber.id,
                     subscriber.contract_number,
                     subscriber.fname + " " + subscriber.lname,
                     subscriber.address,
@@ -71,6 +76,8 @@ def get_sub_area_subscribers(oid):
             'recordsFiltered': total_records,
             'data': data
         }
+
+        print(data)
 
         return jsonify(response)
 

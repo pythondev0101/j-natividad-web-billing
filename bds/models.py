@@ -4,6 +4,21 @@ from app.core.models import Base
 from datetime import datetime
 
 
+class Billing(Base, Admin):
+    __tablename__ = 'bds_billings'
+    __amname__ = 'billing'
+    __amdescription__ = 'Billings'
+    __amicon__ = 'pe-7s-cash'
+    __view_url__ = 'bp_bds.billings'
+
+    number = db.Column(db.String(64), nullable=False)
+    name = db.Column(db.String(64), nullable=True)
+    description = db.Column(db.String(1000),nullable=True)
+    deliveries = db.relationship('Delivery', cascade='all,delete', backref="billing")
+    date_from = db.Column(db.DateTime, default=datetime.utcnow,nullable=True)
+    date_to = db.Column(db.DateTime, default=datetime.utcnow,nullable=True)
+
+
 class Subscriber(Base, Admin):
     __tablename__ = 'bds_subscribers'
     __amname__ = 'subscriber'
@@ -38,6 +53,7 @@ class Delivery(Base, Admin):
     __view_url__ = 'bp_bds.deliveries'
     
     """ COLUMNS """
+    billing_id = db.Column(db.Integer, db.ForeignKey('bds_billings.id', ondelete="SET NULL"), nullable=True)
     subscriber_id = db.Column(db.Integer, db.ForeignKey('bds_subscribers.id', ondelete="SET NULL"), nullable=True)
     messenger_id = db.Column(db.Integer, db.ForeignKey('auth_user.id', ondelete="SET NULL"), nullable=True)
     messenger = db.relationship('User',backref="deliveries", uselist=False)

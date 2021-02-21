@@ -58,7 +58,7 @@ def edit_subscriber(oid):
         form.deliveries_inline.models = ins.deliveries
 
         return admin_edit(Subscriber, form, 'bp_bds.edit_subscriber', oid, 'bp_bds.subscribers', scripts=[{'bp_bds.static': 'js/subscriber.js'}],\
-            extra_modal_template='bds/bds_details_modal.html')
+            extra_modal_template='bds/delivery/bds_details_modal.html')
 
     if not form.validate_on_submit():
         for key, value in form.errors.items():

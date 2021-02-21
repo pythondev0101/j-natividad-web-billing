@@ -1,5 +1,5 @@
 from app.core import CoreModule
-from .models import (Delivery, Area, Subscriber, Messenger, SubArea, Municipality,\
+from .models import (Billing, Delivery, Area, Subscriber, Messenger, SubArea, Municipality,\
     DeliveryMap)
 
 
@@ -11,7 +11,7 @@ class BDSModule(CoreModule):
     module_short_description = 'BDS'
     module_long_description = "Billing Delivery System"
     models = [
-        Delivery, Area, Subscriber, Messenger, DeliveryMap
+        Billing, Delivery, Area, Subscriber, Messenger, DeliveryMap
         ]
     no_admin_models =[SubArea, Municipality]
     version = '1.0'
@@ -20,6 +20,10 @@ class BDSModule(CoreModule):
             DeliveryMap
         ],
         'Transactions': [
-            Delivery, Area, Subscriber, Messenger
+            Billing,
+            Delivery,
+            Area,
+            Subscriber,
+            Messenger
         ]
     }
