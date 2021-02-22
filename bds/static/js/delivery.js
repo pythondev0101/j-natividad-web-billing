@@ -13,13 +13,13 @@ var dtbl_subscribers;
 //call onLoad func...
 
 
-function onLoad(table) {
+function onLoad() {
     var sessMunicipality = localStorage.getItem('sessMunicipality');
     var sessArea = localStorage.getItem('sessArea');
     var sessSubArea = localStorage.getItem('sessSubArea');
     var sessSubAreaID = localStorage.getItem('sessSubAreaID');
     BILLINGID = localStorage.getItem('billingID');
-
+    
     $("#btnSubAreaLabel").val(sessSubAreaID);
 
     if (!(sessSubAreaID)) {
@@ -395,9 +395,15 @@ $(document).ready(function () {
 
 
     $("#tbl_subscribers").on('click', '.btn_details', function () {
-        var subscriberContractNo = $(this).closest("tr").children('td:first').text();
-        var sub_area_name = $("#btnSubAreaLabel").html().trim();
-        const url = "/bds/api/deliveries/" + subscriberContractNo + `?sub_area_name=` + sub_area_name;
+        var $row = $(this).closest('tr');
+
+        // Get row data
+        var data = dtbl_subscribers.row($row).data();
+
+        // Get row ID
+        var rowId = data[0];
+
+        const url = "/bds/subscribers/" + rowId + "/delivery" + `?billing_id=` + BILLINGID;
 
         $.ajax({
             url: url,
@@ -460,7 +466,6 @@ $(document).ready(function () {
 
     $("#div_modal_footer").on('click', '#btn_confirm', function () {
         const url = "/bds/api/delivery/" + DELIVERYID + "/confirm";
-        var _area_name = $("#btnSubAreaLabel").html()
 
         $.ajax({
             url: url,

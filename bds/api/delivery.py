@@ -8,7 +8,7 @@ from flask import (jsonify, request, current_app)
 from app import db, csrf
 from app.auth.models import User
 from bds import bp_bds
-from bds.models import Delivery, Subscriber, Area, SubArea
+from bds.models import Billing, Delivery, Subscriber, Area, SubArea
 
 
 @bp_bds.route('/api/confirm-deliver', methods=['POST'])
@@ -24,7 +24,15 @@ def confirm_deliver():
     messenger_id = data['messenger_id']
     subscriber_id = data['subscriber_id']
     date_mobile_delivery = data['date_mobile_delivery']
-    delivery = Delivery.query.filter_by(subscriber_id=subscriber_id,status="IN-PROGRESS",active=1).first()
+
+    active_billing = Billing.query.filter_by(active=1).first()
+
+    delivery = Delivery.query.filter_by(
+        subscriber_id=subscriber_id,
+        status="IN-PROGRESS",
+        active=1,
+        billing_id=active_billing.id
+        ).first()
     
     print(date_mobile_delivery)
 
@@ -77,23 +85,35 @@ def get_deliveries():
     from app.auth.models import messenger_areas
 
     _query = request.args.get('query')
+
     deliveries: Delivery
 
-    if _query == 'by_messenger':
+    active_billing = Billing.query.filter_by(active=1).first()
+
+    if active_billing is None:
+        return jsonify({'deliveries': []})
+
+    if not _query == 'by_messenger':
+        deliveries = Delivery.query.filter_by(active=1).all()
+        
+    else:
         _messenger_id = request.args.get('messenger_id')
         messenger = User.query.get_or_404(_messenger_id)
-        query = db.session.query(Area.id).join(messenger_areas).filter_by(messenger_id=messenger.id)
-        print(query.all())
-        _sub_areas_query = db.session.query(SubArea.id).join(Area).filter(SubArea.area_id.in_(query))
-        print(_sub_areas_query.all())
-        deliveries = db.session.query(Delivery).filter_by(active=1).join(Subscriber).join(SubArea).filter(SubArea.id.in_(_sub_areas_query)).all()
-    else:
-        deliveries = Delivery.query.filter_by(active=1).all()
 
-    # SERIALIZE MODELS
-    _list = []
+        query = db.session.query(Area.id).join(messenger_areas).filter_by(messenger_id=messenger.id)
+        
+        _sub_areas_query = db.session.query(SubArea.id).join(Area).filter(SubArea.area_id.in_(query))
+        
+        deliveries = db.session.query(Delivery).filter_by(
+            active=1,
+            billing_id=active_billing.id
+            ).join(Subscriber).join(SubArea).filter(
+                SubArea.id.in_(_sub_areas_query)
+                ).all()
+
+    data = []
     for delivery in deliveries:
-        _list.append({
+        data.append({
             'id': delivery.id,
             'subscriber_id': delivery.subscriber.id,
             'subscriber_fname': delivery.subscriber.fname,
@@ -107,7 +127,7 @@ def get_deliveries():
         })
 
     # WE SERIALIZE AND RETURN LIST INSTEAD OF MODELS 
-    return jsonify({'deliveries': _list})
+    return jsonify({'deliveries': data})
 
 
 def _isCoordsNear(checkPointLng, checkPointLat, centerPoint, km):

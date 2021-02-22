@@ -6,6 +6,18 @@ $(document).ready(function(){
             {
                 "targets": 0,
                 "visible": false,
+            },
+            {
+                "targets": 1,
+                "render": function(data, type, row){
+                    if (!(data)){
+                        return `<div class="mb-2 mr-2 badge badge-pill badge-secondary">INACTIVE</div>`;
+                    }
+                    
+                    return `<div class="mb-2 mr-2 badge badge-pill badge-success">ACTIVE</div>`;
+
+                    
+                }
             }
         ],
         ajax: {
@@ -28,14 +40,13 @@ $(document).ready(function(){
         var selected_billing = dtbl_billings.row('.selected').data();
 
         localStorage.setItem('billingID', selected_billing[0]);
-        BILLINGID = localStorage.getItem('billingID');
 
         $("#billing_no").val(selected_billing[1]);
         $("#name").val(selected_billing[2]);
         $("#date_from").val(selected_billing[3]);
         $("#date_to").val(selected_billing[4]);
 
-        dtbl_subscribers.ajax.reload();
+        location.reload();
 
     } );
 });

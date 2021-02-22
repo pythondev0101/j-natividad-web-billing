@@ -28,15 +28,16 @@ def deliveries():
         modals=modals, scripts=scripts)
 
 
-@bp_bds.route('/api/deliveries/<string:contract_number>', methods=['GET'])
+@bp_bds.route('/subscribers/<int:subscriber_id>/delivery', methods=['GET'])
 @cross_origin()
-def get_delivery(contract_number):
+def get_delivery(subscriber_id):
+    billing_id = request.args.get('billing_id')
 
-    _sub_area_name = request.args['sub_area_name']
-    sub_area = SubArea.query.filter_by(name=_sub_area_name).first()
-
-    delivery = Delivery.query.filter_by(active=1).join(Subscriber)\
-        .filter_by(contract_number=contract_number,sub_area_id=sub_area.id).first()
+    delivery = Delivery.query.filter_by(
+        active=1,
+        subscriber_id=subscriber_id,
+        billing_id=billing_id
+        ).first()
 
     if delivery is None:
         return jsonify({
@@ -49,6 +50,7 @@ def get_delivery(contract_number):
 
     # WE SERIALIZE AND RETURN LIST INSTEAD OF MODELS
 
+    print(delivery.image_path)
     return jsonify({
         'id': delivery.id,
         'subscriber_id': delivery.subscriber.id,
@@ -247,6 +249,7 @@ def get_dtbl_billings():
     for billing in billings:
         _data.append([
             billing.id,
+            billing.active,
             billing.number,
             billing.name,
             billing.date_from,

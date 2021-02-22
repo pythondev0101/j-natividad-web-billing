@@ -28,8 +28,22 @@ class SubscriberForm(AdminTableForm):
 
 
 class BillingForm(AdminTableForm):
-    __table_columns__ = ['Billing No.','Name', 'Description', 'Date From', 'Date To', 'Created By', 'Created At']
+    __table_columns__ = ['Status','Billing No.','Name', 'Description', 'Date From', 'Date To', 'Created By', 'Created At']
     __heading__ = 'Billings'
+
+    number = AdminField(label='Billing No.',validators=[DataRequired()], readonly=True)
+    name = AdminField(label="Name",validators=[DataRequired()])
+    description = AdminField(label="Description",validators=[DataRequired()])
+    date_from = AdminField(label="Date From", validators=[DataRequired()], type='date')
+    date_to = AdminField(label="Date To", validators=[DataRequired()], type='date')
+
+    @property
+    def fields(self):
+        return [[self.number ,self.name, self.description], [self.date_from, self.date_to]]
+
+
+class BillingEditForm(AdminEditForm):
+    __heading__ = 'Edit billing'
 
     number = AdminField(label='Billing No.',validators=[DataRequired()], readonly=True)
     name = AdminField(label="Name",validators=[DataRequired()])
