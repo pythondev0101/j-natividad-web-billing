@@ -55,7 +55,7 @@ def edit_subscriber(oid):
     form = SubscriberEditForm(obj=ins)
 
     if request.method == "GET":
-        form.deliveries_inline.models = ins.deliveries
+        form.deliveries_inline.data = ins.deliveries
 
         return admin_edit(Subscriber, form, 'bp_bds.edit_subscriber', oid, 'bp_bds.subscribers', scripts=[{'bp_bds.static': 'js/subscriber.js'}],\
             extra_modal_template='bds/delivery/bds_details_modal.html')

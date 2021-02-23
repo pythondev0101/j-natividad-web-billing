@@ -58,6 +58,9 @@ def edit_messenger(oid):
     form = MessengerEditForm(obj=ins)
 
     if request.method == "GET":
+
+        form.areas_inline.data = ins.areas
+
         return admin_edit(Messenger, form,'bp_bds.edit_messenger',oid, 'bp_bds.messengers',\
             module_name='bds')
 

@@ -107,6 +107,13 @@ class MessengerForm(AdminTableForm):
         return [[self.fname, self.lname],[self.username,self.email],[self.is_admin]]
 
 
+class MessengerAreasInline(AdminInlineForm):
+    __table_id__ = 'tbl_inline_areas'
+    __table_columns__ = ['Area name','Area Description','Municipality']
+    __title__ = "Areas"
+    __html__ = 'bds/messenger/bds_messenger_areas_inline.html'
+
+
 class MessengerEditForm(AdminEditForm):
     from .models import Area
 
@@ -118,9 +125,15 @@ class MessengerEditForm(AdminEditForm):
     lname = AdminField(label='Last Name', validators=[DataRequired()])
     is_admin = AdminField(label='Is admin?',required=False, type='checkbox')
 
+    areas_inline = MessengerAreasInline()
+
     @property
     def fields(self):
         return [[self.fname, self.lname],[self.username,self.email], [self.is_admin]]
+
+    @property
+    def inlines(self):
+        return [self.areas_inline]
 
 
 class SubAreaSubscriberInline(AdminInlineForm):
