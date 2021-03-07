@@ -1,102 +1,100 @@
-""" MODULE: AUTH.FORMS"""
-""" FLASK IMPORTS """
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
-from wtforms.validators import DataRequired, ValidationError, Email, EqualTo
-from datetime import datetime
-"""--------------END--------------"""
-
-from app.admin.forms import AdminIndexForm,AdminEditForm, AdminInlineForm, AdminField
+from wtforms.validators import DataRequired
+from app.admin.forms import AdminTableForm, AdminEditForm, AdminInlineForm, AdminField
 from .models import Role
 
 
-class PermissionInlineForm(AdminInlineForm):
-    headers =['Model','Read','create','write','delete']
-    title = "Access Rights"
-    html = 'auth/permission_inline.html'
 
-class ModelInlineForm(AdminInlineForm):
-    headers = ['Model','Read','create','write','delete','add']
-    title = "Add Rights"
-    html = 'auth/model_inline.html'
-
-
-# TODO: FOR FUTURE VERSION CHANGE THIS TO CLASS INHERITANCE
-class UserEditForm(AdminEditForm):
-    edit_title = "Edit User"
-    edit_message = "message"
+class UserForm(AdminTableForm):
+    __heading__ = "Users"
+    __table_columns__ = ['Username', 'First name', 'last name', 'role', 'email']
 
     username = AdminField(label='Username', validators=[DataRequired()])
-    email = AdminField(label='Email', input_type='email',required=False)
+    email = AdminField(label='Email', type='email',required=False)
     fname = AdminField(label='First Name', validators=[DataRequired()])
     lname = AdminField(label='Last Name', validators=[DataRequired()])
-    role_id = AdminField(label='Role',validators=[DataRequired()],input_type='number',model=Role)
+    role_id = AdminField(label='Role',validators=[DataRequired()],type='number',model=Role)
+
+    @property
+    def fields(self):
+        return [[self.fname, self.lname],[self.username,self.email],[self.role_id]]
+
+
+class PermissionInlineForm(AdminInlineForm):
+    __table_columns__ = 'tbl_inline_permissions'
+    __table_columns__ =['Model','Read','create','write','delete']
+    __title__ = "Access Rights"
+    __html__ = 'auth/permission_inline.html'
+
+
+class UserEditForm(AdminEditForm):
+    __heading__ = "Edit User"
+
+    username = AdminField(label='Username', validators=[DataRequired()])
+    email = AdminField(label='Email', type='email',required=False)
+    fname = AdminField(label='First Name', validators=[DataRequired()])
+    lname = AdminField(label='Last Name', validators=[DataRequired()])
+    role_id = AdminField(label='Role',validators=[DataRequired()],type='number',model=Role)
 
     permission_inline = PermissionInlineForm()
-    inlines = [permission_inline]
 
-    def edit_fields(self):
+    @property
+    def fields(self):
         return [[self.fname, self.lname],[self.username,self.email],[self.role_id]]
 
-
-class UserForm(AdminIndexForm):
-    username = AdminField(label='Username', validators=[DataRequired()])
-    email = AdminField(label='Email', input_type='email',required=False)
-    fname = AdminField(label='First Name', validators=[DataRequired()])
-    lname = AdminField(label='Last Name', validators=[DataRequired()])
-    role_id = AdminField(label='Role',validators=[DataRequired()],input_type='number',model=Role)
-
-    def create_fields(self):
-        return [[self.fname, self.lname],[self.username,self.email],[self.role_id]]
-
-    index_headers = ['Username', 'First name', 'last name', 'role', 'email']
-    index_title = "Users"
-    index_message = "List of users"
+    @property
+    def inlines(self):
+        return [self.permission_inline]
 
 
-class UserPermissionForm(AdminIndexForm):
+class UserPermissionForm(AdminTableForm):
     index_headers = ['Username', 'Name', 'Model', 'Read','create', 'Write', 'Delete']
     index_title = "User Permissions"
     index_message = "Message"
 
 
 class RoleModelInlineForm(AdminInlineForm):
-    headers = ['Model','Read','create','write','delete']
-    title = "Add role permissions"
+    __table_id__ = 'tbl_inline_permissions'
+    __table_columns__ = ['Model','Read','create','write','delete']
+    __title__ = "Add role permissions"
 
 
-class RoleCreateForm(AdminIndexForm):
-    index_headers = ['Name', 'created at', 'updated at']
-    index_title = "User Roles"
-    index_message = "Groups of permissions"
+class RoleCreateForm(AdminTableForm):
+    __heading__ = "User Roles"
+    __table_columns__ = ['Name', 'created at', 'updated at']
+    __subheading__ = "Groups of permissions"
 
     name = AdminField(label="Name",validators=[DataRequired()])
-
-    def create_fields(self):
-        return [[self.name]]
 
     inline = RoleModelInlineForm()
 
-    inlines = [inline]
+    @property
+    def fields(self):
+        return [[self.name]]
+
+    @property
+    def inlines(self):
+        return [self.inline]
 
 
 class RoleEditForm(AdminEditForm):
+    __heading__ = "Edit Role"
+
     name = AdminField(label="Name",validators=[DataRequired()])
 
-    def edit_fields(self):
+    permission_inline = PermissionInlineForm()
+    permission_inline.__html__ = "auth/role_permission_inline.html"
+
+    @property
+    def fields(self):
         return [[self.name]]
 
-    edit_title = "Edit Role"
-    edit_message = "message"
-    
-    permission_inline = PermissionInlineForm()
-    model_inline = ModelInlineForm()
-    permission_inline.html = "auth/role_permission_inline.html"
-    model_inline.html = 'auth/role_model_inline.html'
-    inlines = [permission_inline,model_inline]
+    @property
+    def inlines(self):
+        return [self.permission_inline]
 
 
-# AUTH.FORMS.LOGINFORM
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])

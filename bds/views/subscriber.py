@@ -2,7 +2,7 @@ from datetime import datetime
 from flask import redirect, url_for, request, flash, jsonify
 from flask_login import current_user, login_required
 from app import db, csrf
-from app.admin.routes import admin_table, admin_edit
+from app.admin.templating import admin_table, admin_edit
 from bds import bp_bds
 from bds.models import Subscriber, Delivery
 from bds.forms import SubscriberForm, SubscriberEditForm
@@ -14,9 +14,9 @@ from bds.forms import SubscriberForm, SubscriberEditForm
 def subscribers():
     fields = [Subscriber.id, Subscriber.fname,Subscriber.lname,Subscriber.created_at, Subscriber.updated_at]
     form = SubscriberForm()
-    return admin_table(Subscriber, fields=fields, form=form, template='bds/bds_table.html',create_url="bp_bds.create_subscriber",\
-        edit_url="bp_bds.edit_subscriber", extra_modal="bds/bds_upload_subscribers_csv.html",\
-            action="bds/bds_subscriber_action.html")
+    return admin_table(Subscriber, fields=fields, form=form, create_url="bp_bds.create_subscriber",\
+        edit_url="bp_bds.edit_subscriber", modals=["bds/subscriber/bds_upload_subscribers_csv.html"],\
+            action_template="bds/subscriber/bds_subscriber_action.html")
 
 
 @bp_bds.route('/subscribers/create',methods=['POST'])
@@ -53,11 +53,12 @@ def create_subscriber():
 def edit_subscriber(oid):
     ins = Subscriber.query.get_or_404(oid)
     form = SubscriberEditForm(obj=ins)
-    if request.method == "GET":
-        form.deliveries_inline.models = ins.deliveries
 
-        return admin_edit(form,'bp_bds.edit_subscriber',oid, scripts=[{'bp_bds.static': 'js/subscriber.js'}],
-            model=Subscriber,template='bds/bds_edit.html', extra_modal='bds/bds_details_modal.html')
+    if request.method == "GET":
+        form.deliveries_inline.data = ins.deliveries
+
+        return admin_edit(Subscriber, form, 'bp_bds.edit_subscriber', oid, 'bp_bds.subscribers', scripts=[{'bp_bds.static': 'js/subscriber.js'}],\
+            extra_modal_template='bds/delivery/bds_details_modal.html')
 
     if not form.validate_on_submit():
         for key, value in form.errors.items():

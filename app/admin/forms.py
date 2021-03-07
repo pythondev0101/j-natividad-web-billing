@@ -4,68 +4,79 @@ from wtforms import Field
 from wtforms import widgets
 
 
-class AdminIndexForm(FlaskForm):
+class AdminTableForm(FlaskForm):
     
-    index_message = 'List of models'
+    @property
+    def __table_columns__(self):
+        raise NotImplementedError('Must implement table_columns')
 
     @property
-    def index_headers(self):
-        raise NotImplementedError('Must implement index_headers')
+    def __heading__(self):
+        raise NotImplementedError('Must implement heading')
 
     @property
-    def index_title(self):
-        raise NotImplementedError('Must implement index_title')
+    def fields(self):
+        raise NotImplementedError('Must implement fields')
 
     @property
-    def create_fields(self):
-        raise NotImplementedError('Must implement create_fields')
+    def inlines(self):
+        pass
     
-    def __init__(self,*args,**kwargs):
-        super(AdminIndexForm,self).__init__(*args,**kwargs)
-        self.title = self.index_title
+    def __init__(self, *args, **kwargs):
+        super(AdminTableForm,self).__init__(*args,**kwargs)
+        self.__title__ = self.__heading__
+        self.__subheading__ = "List of " + self.__heading__
 
 
 class AdminEditForm(FlaskForm):
-    inlines = None
 
     @property
-    def edit_title(self):
-        raise NotImplementedError('Must implement edit_title')
+    def __heading__(self):
+        raise NotImplementedError('Must implement heading')
 
     @property
-    def edit_message(self):
-        raise NotImplementedError('Must implement edit_message')
+    def fields(self):
+        raise NotImplementedError('Must implement fields')
 
     @property
-    def edit_fields(self):
-        raise NotImplementedError('Must implement edit_fields')
-
-    @property
-    def fields_data(self):
-        raise NotImplementedError('Must implement fields_data')
+    def inlines(self):
+        pass
+    
+    def __init__(self, *args, **kwargs):
+        super(AdminEditForm,self).__init__(*args,**kwargs)
+        self.__title__ = self.__heading__
+        self.__subheading__ = "Update existing data"
 
 
 class AdminInlineForm(object):
-    models = None
+    data = None
 
     @property
-    def headers(self):
-        raise NotImplementedError('Must implement headers')
+    def __table_id__(self):
+        raise NotImplementedError('Must implement table_id')
 
     @property
-    def title(self):
+    def __table_columns__(self):
+        raise NotImplementedError('Must implement table_columns')
+
+    @property
+    def __title__(self):
         raise NotImplementedError('Must implement title')
 
     @property
-    def html(self):
+    def __html__(self):
         raise NotImplementedError('Must implement html')
+
+    @property
+    def buttons(self):
+        pass
 
 
 class AdminField(Field):
 
     widget = widgets.TextInput()
     # if no validators argument then make required = False
-    def __init__(self,input_type="text",placeholder='',model=None,required=True,readonly=False,*args, **kwargs):
+    def __init__(self,type="text",placeholder='',model=None,required=True,readonly=False,*args, **kwargs):
         super(AdminField,self).__init__(*args,**kwargs)
         self.label = kwargs.get('label')
         self.model = model
@@ -79,9 +90,10 @@ class AdminField(Field):
             self.placeholder = placeholder
 
         if self.model:
-            self.input_type = 'select'
+            self.type = 'select'
+            self.select_data = model.query.all()
         else:
-            self.input_type = input_type
+            self.type = type
 
     def process_formdata(self, valuelist):
         if valuelist:

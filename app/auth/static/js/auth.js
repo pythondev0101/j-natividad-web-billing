@@ -8,17 +8,11 @@ $(document).ready(function () {
         }
     });
 
-    var table = $('.inline-table').DataTable({
-        "dom": 'rtip',
-        "bInfo": false,
-        "scrollY": "200px",
-        "scrollCollapse": true,
-        "paging": false,
-    });
 
     if (!($('#role_id').val() == 1)) {
         $('.inlines-card').hide();
     }
+
 
     $('#role_id').on('change', function () {
         if (!(this.value == 1)) {
@@ -27,6 +21,7 @@ $(document).ready(function () {
             $('.inlines-card').show();
         }
     });
+
 
     $("#username").change(function () {
 
@@ -181,30 +176,3 @@ $(document).ready(function () {
     });
 
 });
-
-
-function role_edit_chk(permission_id) {
-    var input_read = document.getElementById("edit_chk_read_".concat(permission_id)).checked;
-    var input_create = document.getElementById("edit_chk_create_".concat(permission_id)).checked;
-    var input_write = document.getElementById("edit_chk_write_".concat(permission_id)).checked;
-    var input_delete = document.getElementById("edit_chk_delete_".concat(permission_id)).checked;
-    var csrf_token = "{{ csrf_token() }}";
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open("post", "/auth/role_edit_permission", true);
-    xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-    xmlHttp.onreadystatechange = function () {
-        if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
-            if (xmlHttp.responseText.trim() == 1) {
-                console.log("Saved");
-            } else if (xmlHttp.responseText.trim() == 0) {
-                console.log("Not Saved");
-            }
-        }
-    }
-    xmlHttp.setRequestHeader("X-CSRFToken", csrf_token);
-    var data = JSON.stringify({
-        "permission_id": permission_id, "read": input_read, "create": input_create,
-        "write": input_write, "delete": input_delete
-    });
-    xmlHttp.send(data);
-}

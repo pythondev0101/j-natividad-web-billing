@@ -1,7 +1,39 @@
 import os
 from dotenv import load_dotenv
 
+
+
 basedir = os.path.abspath(os.path.dirname(__file__))
+
+
+class Config(object):
+    load_dotenv()
+
+    SECRET_KEY = os.environ.get('SECRET_KEY') # Key
+
+    CORS_HEADERS = 'Content-Type' # Flask Cors
+
+    # DEVELOPERS-NOTE: ADMIN PAGE CONFIGURATIONS HERE
+    ADMIN = {
+        'APPLICATION_NAME': 'Likes',
+        'DATA_PER_PAGE': 25,
+        'HOME_URL': 'bp_admin.dashboard',
+        'DASHBOARD_URL': 'bp_admin.dashboard',
+        'MODELS_SIDEBAR_HEADER': 'SYSTEM MODELS'
+    }
+    #                 -END-
+
+    # DEVELOPERS-NOTE: AUTH CONFIGURATIONS HERE
+    AUTH = {
+        'LOGIN_REDIRECT_URL': 'bp_admin.dashboard',
+    }
+    #                 -END-
+
+    # DEVELOPER-NOTE: -ADD YOUR CONFIGURATIONS HERE-
+    UPLOAD_IMAGES_FOLDER = basedir + "/bds/static/img/uploads"
+    UPLOAD_CSV_FOLDER = basedir + "/bds/static/csv/uploads"
+    #                 -END-
+
 
 def _get_database(server):
     load_dotenv()
@@ -15,21 +47,6 @@ def _get_database(server):
     else:
         return "mysql+pymysql://{}:{}@{}/{}".format(user,password,host,database)
 
-
-class Config(object):
-    load_dotenv()
-
-    SECRET_KEY = os.environ.get('SECRET_KEY')
-
-    """ FLASK-CORS """
-    CORS_HEADERS = 'Content-Type'
-
-    """ PAGINATION """
-    DATA_PER_PAGE = 7
-
-    # ADD HERE YOUR CONFIG
-    UPLOAD_IMAGES_FOLDER = basedir + "/bds/static/img/uploads"
-    UPLOAD_CSV_FOLDER = basedir + "/bds/static/csv/uploads"
 
 
 class DevelopmentConfig(Config):
@@ -65,11 +82,3 @@ app_config = {
     'production': ProductionConfig,
     'testing': TestingConfig
 }
-
-
-class HomeBestConfig:
-    load_dotenv()
-    HOST = os.environ.get('DATABASE_HOST')
-    USER = os.environ.get('DATABASE_USER')
-    PASSWORD = os.environ.get('DATABASE_PASSWORD')
-    DATABASE = os.environ.get('DATABASE_NAME')

@@ -10,17 +10,18 @@ from app.auth.models import User, UserPermission, Role
 from app.auth.forms import UserForm, UserEditForm, UserPermissionForm
 from app.auth import auth_urls
 from app.auth.permissions import load_permissions, check_create
-from app.admin.routes import admin_table, admin_edit
+from app.admin.templating import admin_table, admin_edit
 
 
 
 @bp_auth.route('/users')
 @login_required
-def users(**kwargs):
+def users(**options):
     form = UserForm()
     fields = [User.id, User.username, User.fname, User.lname, Role.name, User.email]
     models = [User, Role]
-    return admin_table(*models, fields=fields, list_view_url=auth_urls['users'], create_url='bp_auth.create_user', edit_url="bp_auth.edit_user", form=form,kwargs=kwargs)
+
+    return admin_table(*models, fields=fields, form=form, create_url='bp_auth.create_user', edit_url="bp_auth.edit_user", **options)
 
 
 @bp_auth.route('/users/create', methods=['POST'])
@@ -84,11 +85,14 @@ def edit_user(oid,**kwargs):
 
     if request.method == "GET":
         user_permissions = UserPermission.query.filter_by(user_id=oid).all()
-        form.permission_inline.models = user_permissions
+        form.permission_inline.data = user_permissions
 
-        return admin_edit(form=form, update_url=auth_urls['edit'], action="auth/user_edit_action.html", \
-            oid=oid, modal_form=True,extra_modal='auth/user_change_password_modal.html', scripts=[{'bp_auth.static':'js/auth.js'},],
-            model=User,kwargs=kwargs)
+        _scripts = [
+            {'bp_auth.static': 'js/auth.js'},
+            {'bp_admin.static': 'js/admin_edit.js'}
+        ]
+        return admin_edit(User, form, auth_urls['edit'], oid, auth_urls['users'],action_template="auth/user_edit_action.html", \
+            modals=['auth/user_change_password_modal.html'], scripts=_scripts, **kwargs)
     
     if not form.validate_on_submit():
         for key, value in form.errors.items():
@@ -112,7 +116,6 @@ def edit_user(oid,**kwargs):
         flash(str(e),'error')
     
     return redirect(url_for(auth_urls['users']))
-
 
 
 @bp_auth.route('/permissions')
@@ -178,6 +181,7 @@ def edit_permission(oid1, oid2):
         resp = jsonify(0)
         resp.headers.add('Access-Control-Allow-Origin', '*')
         resp.status_code = 200
+        
         return resp
 
     if permission_type == 'read':
@@ -193,47 +197,11 @@ def edit_permission(oid1, oid2):
         permission.delete = value
 
     db.session.commit()
+
     load_permissions(current_user.id)
+
     resp = jsonify(1)
     resp.headers.add('Access-Control-Allow-Origin', '*')
     resp.status_code = 200
+
     return resp
-
-
-@bp_auth.route('/user_add_permission/<int:oid>/', methods=['POST'])
-@login_required
-def user_add_permission(oid):
-    if request.method == "POST":
-        user = User.query.get_or_404(oid)
-        model = CoreModel.query.filter_by(id=request.args.get('model_id')).first()
-        read, create, write, delete = request.form.get('chk_read', 0), request.form.get('chk_create', 0), \
-            request.form.get('chk_write', 0), request.form.get('chk_delete', 0)
-
-        if read == 'on':
-            read = 1
-        if create == 'on':
-            create = 1
-        if write == 'on':
-            write = 1
-        if delete == 'on':
-            delete = 1
-
-        permission = UserPermission(user_id=user.id, model=model, read=read, create=create, write=write, delete=delete)
-        user.permissions.append(permission)
-        db.session.commit()
-        load_permissions(current_user.id)
-        return redirect(url_for(auth_urls['edit'], oid=oid))
-
-
-@bp_auth.route('/user_delete_permission/<int:oid>/', methods=['POST'])
-@login_required
-def user_delete_permission(oid):
-    if request.method == "POST":
-        try:
-            permission = UserPermission.query.get(oid)
-            db.session.delete(permission)
-            db.session.commit()
-            load_permissions(current_user.id)
-            return redirect(request.referrer)
-        except Exception as e:
-            db.session.rollback()
