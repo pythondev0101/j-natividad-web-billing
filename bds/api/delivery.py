@@ -16,14 +16,16 @@ from bds.models import Billing, Delivery, Subscriber, Area, SubArea
 def confirm_deliver():
 
     # FETCH DATA
-    data = json.loads(request.form['data'])
-    print(data)
-    longitude = data['longitude']
-    latitude = data['latitude']
-    accuracy = data['accuracy']
-    messenger_id = data['messenger_id']
-    subscriber_id = data['subscriber_id']
-    date_mobile_delivery = data['date_mobile_delivery']
+    # data = json.loads(request.form['data'])
+    # print(data)
+    print(request.form)
+
+    longitude = request.form['longitude']
+    latitude = request.form['latitude']
+    accuracy = request.form['accuracy']
+    messenger_id = request.form['messenger_id']
+    subscriber_id = request.form['subscriber_id']
+    date_mobile_delivery = request.form['date_mobile_delivery']
 
     active_billing = Billing.query.filter_by(active=1).first()
 
@@ -36,6 +38,8 @@ def confirm_deliver():
     
     print(date_mobile_delivery)
 
+    date = datetime.strptime(str(date_mobile_delivery), '%Y-%m-%d %H:%M:%S')
+
     if delivery is None:
         return jsonify({'result': True})
 
@@ -46,11 +50,10 @@ def confirm_deliver():
         delivery.status = "PENDING"
         print("PENDING", delivery.id)
 
-    date = datetime.strptime(date_mobile_delivery, '%m/%d/%Y, %I:%M:%S %p')
-
     img_file = request.files['file']
     
     if img_file is None:
+        print("Image file is none!")
         return jsonify({'result': False})
 
     filename = secure_filename(img_file.filename)
@@ -113,6 +116,7 @@ def get_deliveries():
 
     data = []
     for delivery in deliveries:
+
         data.append({
             'id': delivery.id,
             'subscriber_id': delivery.subscriber.id,
@@ -123,9 +127,12 @@ def get_deliveries():
             'delivery_date': delivery.delivery_date,
             'status': delivery.status,
             'longitude': delivery.subscriber.longitude,
-            'latitude': delivery.subscriber.latitude
+            'latitude': delivery.subscriber.latitude,
+            'area_id': delivery.subscriber.sub_area.area.id,
+            'area_name': delivery.subscriber.sub_area.area.name,
+            'sub_area_id': delivery.subscriber.sub_area.id,
+            'sub_area_name': delivery.subscriber.sub_area.name,
         })
-
     # WE SERIALIZE AND RETURN LIST INSTEAD OF MODELS 
     return jsonify({'deliveries': data})
 
