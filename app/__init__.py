@@ -20,6 +20,7 @@ migrate = Migrate()
 csrf = CSRFProtect()
 cors = CORS()
 login_manager = LoginManager()
+cors = CORS()
 
 # DEVELOPERS-NOTE: -INITIATE YOUR IMPORTS HERE-
 

@@ -29,7 +29,6 @@ def sub_areas():
     return admin_table(SubArea, fields=fields,form=form, create_modal=False, create_button=True,\
         edit_url="bp_bds.edit_sub_area", create_url="bp_bds.create_sub_area")
 
-
 @bp_bds.route('/sub-areas/create', methods=['GET','POST'])
 @login_required
 def create_sub_area():
@@ -78,7 +77,6 @@ def edit_sub_area(oid):
 
         return admin_edit(SubArea, form, 'bp_bds.edit_sub_area', oid, 'bp_bds.sub_areas', \
             modals=modals, scripts=scripts)
-
     try:
         ins.name = request.form.get('name')
         ins.description = request.form.get('description')

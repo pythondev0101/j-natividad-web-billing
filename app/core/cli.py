@@ -42,6 +42,7 @@ def core_install():
         module_count = 0
 
         for module in MODULES:
+          
             # TODO: Iimprove to kasi kapag nag error ang isa damay lahat dahil sa last_id
             homebest_module = CoreModule.query.filter_by(name=module.module_name).first()
             last_id = 0
@@ -63,7 +64,6 @@ def core_install():
                     db.session.add(new_model)
                     db.session.commit()
                     print("MODEL - {}: SUCCESS".format(new_model.name))
-
                 model_count = model_count + 1
 
             if len(module.no_admin_models) > 0 :

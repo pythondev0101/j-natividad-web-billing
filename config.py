@@ -48,6 +48,7 @@ def _get_database(server):
         return "mysql+pymysql://{}:{}@{}/{}".format(user,password,host,database)
 
 
+
 class DevelopmentConfig(Config):
     """
     Development configurations

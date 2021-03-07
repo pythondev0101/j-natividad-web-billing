@@ -11,6 +11,7 @@ from bds import bp_bds
 from bds.models import Billing, Delivery, Subscriber, Area, SubArea
 
 
+
 @bp_bds.route('/api/confirm-deliver', methods=['POST'])
 @csrf.exempt
 def confirm_deliver():
@@ -54,6 +55,7 @@ def confirm_deliver():
     
     if img_file is None:
         print("Image file is none!")
+
         return jsonify({'result': False})
 
     filename = secure_filename(img_file.filename)
@@ -118,6 +120,7 @@ def get_deliveries():
     for delivery in deliveries:
 
         data.append({
+
             'id': delivery.id,
             'subscriber_id': delivery.subscriber.id,
             'subscriber_fname': delivery.subscriber.fname,
@@ -135,6 +138,7 @@ def get_deliveries():
         })
     # WE SERIALIZE AND RETURN LIST INSTEAD OF MODELS 
     return jsonify({'deliveries': data})
+
 
 
 def _isCoordsNear(checkPointLng, checkPointLat, centerPoint, km):

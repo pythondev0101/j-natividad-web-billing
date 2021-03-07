@@ -22,6 +22,7 @@ def get_subscribers():
         query = db.session.query(Area.id).join(messenger_areas).filter_by(messenger_id=messenger.id)
         _sub_areas_query = db.session.query(SubArea.id).join(Area).filter(SubArea.area_id.in_(query))
         subscribers = db.session.query(Subscriber).join(SubArea).filter(SubArea.id.in_(_sub_areas_query)).all()
+
     else:
         subscribers = Subscriber.query.all()
 
