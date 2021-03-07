@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import (jsonify, request, abort)
 # from flask_cors import cross_origin
 from app import db, csrf
@@ -50,15 +51,18 @@ def get_subscribers():
 def update_location():
     longitude = request.json['longitude']
     latitude = request.json['latitude']
-    # accuracy = request.json['accuracy']
-    # messenger_id = request.json['messenger_id']
+    accuracy = request.json['accuracy']
+    messenger_id = request.json['messenger_id']
     subscriber_id = request.json['subscriber_id']
 
     subscriber = Subscriber.query.get_or_404(subscriber_id)
+    messenger = User.query.get(messenger_id)
 
     subscriber.latitude = latitude
     subscriber.longitude = longitude
-
+    subscriber.accuracy = accuracy
+    subscriber.updated_by = messenger.fname + " " + messenger.lname
+    subscriber.updated_at = datetime.now()
     db.session.commit()
 
     return jsonify({'result': True})

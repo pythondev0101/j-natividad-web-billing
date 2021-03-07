@@ -12,7 +12,7 @@ from bds.forms import SubscriberForm, SubscriberEditForm
 @bp_bds.route('/subscribers')
 @login_required
 def subscribers():
-    fields = [Subscriber.id, Subscriber.fname,Subscriber.lname,Subscriber.created_at, Subscriber.updated_at]
+    fields = [Subscriber.id, Subscriber.fname,Subscriber.lname,Subscriber.created_at, Subscriber.updated_by, Subscriber.updated_at]
     form = SubscriberForm()
     return admin_table(Subscriber, fields=fields, form=form, create_url="bp_bds.create_subscriber",\
         edit_url="bp_bds.edit_subscriber", modals=["bds/subscriber/bds_upload_subscribers_csv.html"],\
